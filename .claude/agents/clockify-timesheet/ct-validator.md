@@ -16,8 +16,10 @@ Apply the V1 validation rules to the `TimelineProposal` you receive and return a
 
 You will receive a `TimelineProposal` JSON object containing:
 - `date`: the reporting date
-- `blocks`: array of time blocks (each has `label`, `start`, `end`, `hours`, `confidence`, `is_constraint`)
+- `blocks`: array of time blocks (each has `label`, `start`, `end`, `hours`, `confidence`, `is_constraint`, and optional `project_key`)
 - `total_hours`: sum of all block hours
+- `per_project_budgets`: map of `project_key → stated hours` (empty object `{}` when the user did not state explicit hours)
+- `shortfall_hours`: gap between `productive_hours_per_day` and total allocated (0 when at or above target)
 - `needs_clarification`: boolean (set by the Reconstructor)
 - `clarification_questions`: array of strings
 
@@ -34,10 +36,13 @@ You will receive a `TimelineProposal` JSON object containing:
 
 **WARN conditions (non-blocking, still proceed to confirm):**
 6. Any block starts before `09:00` or ends after `18:00`
-7. `total_hours < 7.75` — unless the raw narrative explicitly mentioned a shorter day (half day, left early, etc.)
+7. Partial-day check — apply only ONE of the following sub-rules:
+   - If `per_project_budgets` is non-empty and `total_hours` matches the sum of stated budgets (± 0.05h tolerance): **no warning**. The user stated these hours explicitly; any shortfall vs the configured target is intentional. If `shortfall_hours > 0`, surface it as an informational note only: _"User-stated total (X.Xh) is Y.Yh below the configured daily target. This is expected when the narrative explicitly defines hours."_
+   - If `per_project_budgets` is empty and `total_hours < 7.75`: warn that this appears to be a partial day.
+8. Non-constraint blocks mix project-tagged and projectless work in a way that suggests the project split may be incomplete or ambiguous
 
 **PASS:**
-8. None of the above triggered
+9. None of the above triggered
 
 ## Output shape
 

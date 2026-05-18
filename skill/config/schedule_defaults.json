@@ -12,7 +12,8 @@
       "start": "11:00",
       "end": "11:30",
       "recurrence": "weekdays",
-      "is_hard": true
+      "is_hard": true,
+      "project_key": null
     },
     {
       "label": "Lunch break",
@@ -21,7 +22,8 @@
       "end": "13:30",
       "recurrence": "weekdays",
       "is_hard": true,
-      "exclude_from_provider": true
+      "exclude_from_provider": true,
+      "project_key": null
     }
   ],
   "available_gaps": [
@@ -33,7 +35,17 @@
   ],
   "productive_hours_per_day": 8.0,
   "projects": {
-    "aura": "asdadasda",
-    "asda": "asd"
+    "byrrgis": {
+      "clockify_project_id": "69d08b56fd3a1049899a9293",
+      "aliases": [
+        "Byrrgis"
+      ]
+    },
+    "nomei": {
+      "clockify_project_id": "6a0b7c7b5573c2819ec43a40",
+      "aliases": [
+        "Nomei"
+      ]
+    }
   }
 }

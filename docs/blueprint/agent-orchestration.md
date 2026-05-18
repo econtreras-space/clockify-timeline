@@ -4,16 +4,16 @@ Back to [Docs Home](../README.md), [Architectural Principles](./architectural-pr
 
 ## Overview
 
-This document describes a proposed migration of the current monolithic skill into a multi-agent pipeline. It is a reference guideline — not an implementation plan — for evaluating whether this architectural shift is the right next move.
+This document describes the current agent-oriented pipeline used by the skill entry point. It explains how the orchestration boundary is drawn today, where Claude-side reasoning happens, and where Python execution is intentionally limited.
 
-### Problems this migration targets
+### Problems this architecture addresses
 
-The technical gaps documented in [V1 Validation Checklist — Technical Gaps](../v1-validation-checklist.md#a-technical-gaps) all trace back to the same root: the current skill has no executable entry point that ties the five stages together. Each gap is a consequence of that:
+The technical gaps documented in [V1 Validation Checklist](../v1-validation-checklist.md) trace back to the need for an explicit stage boundary. The current architecture addresses them this way:
 
 | Gap | How the agent model addresses it |
 |---|---|
 | No unified orchestration entry point | The Orchestrator agent IS the entry point. It routes between stages explicitly. |
-| Context resets losing in-flight proposal state | Subagents have bounded, focused contexts. The Orchestrator checkpoints state to `/tmp` between stages. |
+| Context resets losing in-flight proposal state | Subagents have bounded, focused contexts and the orchestrator keeps the active proposal boundary explicit. |
 | Clarification loop has no implementation path | Natural: Orchestrator collects user response, re-spawns Reconstructor Agent with enriched input. |
 | Multi-day reports are sequential | Reconstructor Agents can be spawned in parallel — one per day. |
 | Python boundary is ambiguous | Push Agent is the only agent that runs Python scripts. All domain reasoning stays in Claude. |
@@ -31,13 +31,12 @@ The pipeline maps to five agents plus one orchestrator. Each agent has a single 
 | **Pipeline stage** | All — state machine that coordinates the full flow |
 | **Input** | Raw user message (EOD narrative) |
 | **Output** | Confirmation of push, or abort with explanation |
-| **Contract** | `skill/SKILL.md` V1 rules + ADR-001 through ADR-006 |
+| **Contract** | `skill/SKILL.md` V1 rules + ADR set |
 
 **Responsibilities:**
 - Spawn all subagents and pass structured JSON between them
-- Manage pipeline state — track which stages have completed, what the current proposal is
+- Manage pipeline state — track which stages have completed and what the current proposal is
 - Handle all direct user interaction: display proposals, ask clarification questions, process corrections, wait for confirmation
-- Checkpoint state to `/tmp/clockify_pipeline_state.json` after each stage so the pipeline can resume if context resets
 
 **What it does NOT do:** no domain reasoning, no semantic extraction, no Python execution. The Orchestrator is a router, not a reasoner.
 
@@ -77,7 +76,7 @@ The pipeline maps to five agents plus one orchestrator. Each agent has a single 
 | Property | Value |
 |---|---|
 | **Pipeline stage** | 2 — Reconstruct (Analyzer) |
-| **Input** | Single `NarrativeInput` + `Constraint[]` + `AvailableGap[]` |
+| **Input** | Single `NarrativeInput` + schedule defaults/config path |
 | **Output** | `TimelineProposal` (draft) — JSON |
 | **Contract** | `docs/prompts/analyzer-contract.md` + Stage 2 invariants from `skill/SKILL.md` |
 | **Spawned** | One per day. Multi-day reports spawn in parallel. Can be re-spawned with enriched narrative after clarification. |
@@ -85,14 +84,16 @@ The pipeline maps to five agents plus one orchestrator. Each agent has a single 
 **Responsibilities:**
 - Semantic extraction: identify `WorkUnit` candidates from the narrative — what work happened, without time yet
 - Uncertainty assessment: score narrative quality and surface ambiguity; if clarification is needed, return a `NEEDS_CLARIFICATION` signal with questions instead of a draft proposal
-- Temporal reconstruction: distribute `WorkUnit` candidates into `TimelineBlock` allocations within the available gaps, filling `productive_hours_per_day`
+- Temporal reconstruction: distribute `WorkUnit` candidates into `TimelineBlock` allocations within the available gaps, using `productive_hours_per_day` as guidance rather than a mandatory fill target
+- Assign optional provider-agnostic `project_key` values to non-constraint work where the narrative clearly supports one
 - Assemble and return the `TimelineProposal`
 
 **Critical invariants (from analyzer contract):**
 - Allocate only within described work and available gaps
 - Never reconstruct an unreported weekday
 - Surface confidence and ambiguity — do not hide uncertainty
-- Fill the full available surface via proportional expansion of existing work units
+- Keep project assignment provider-agnostic
+- Avoid forcing the full available surface when the narrative only supports a shorter day
 
 This is the only agent that reasons through the semantic extraction and temporal reconstruction prompt contracts. No Python is involved — the reasoning is Claude's own.
 
@@ -109,7 +110,7 @@ This is the only agent that reasons through the semantic extraction and temporal
 | **Spawned** | Once per proposal. Stateless — pure evaluation, no side effects. |
 
 **Responsibilities:**
-- Run the validation rules from `pipeline/validator.py` against the proposal
+- Run the validation rules from the validation contract against the proposal
 - Return one of: `PASS`, `WARN`, `NEEDS_CLARIFICATION`, `REJECT`
 - For `WARN`: include all warning descriptions so the Orchestrator can surface them in the review
 - For `NEEDS_CLARIFICATION`: include targeted questions for the user
@@ -124,13 +125,13 @@ The Validator Agent does not interact with the user and does not modify the prop
 | Property | Value |
 |---|---|
 | **Pipeline stage** | 5 — Push |
-| **Input** | User-confirmed `TimelineProposal` + path to credentials file |
+| **Input** | User-confirmed `TimelineProposal` + project root path |
 | **Output** | Push result: entries pushed, entries failed, error details |
 | **Contract** | `docs/providers/clockify-adapter.md` V1 schema |
 | **Spawned** | Once, after user confirmation. |
 
 **Responsibilities:**
-- Translate the confirmed proposal to a `ProviderPayload` using `adapters/clockify/adapter.py`
+- Translate the confirmed proposal to a `ProviderPayload` by mapping block `project_key` values through `skill/config/schedule_defaults.json`
 - Serialize to `/tmp/clockify_entries.json` in the flat V1 schema
 - Run `skill/scripts/push_clockify.py` and `skill/scripts/generate_timesheet.py`
 - Return a structured result to the Orchestrator
@@ -190,21 +191,22 @@ The Orchestrator never proceeds to Stage 5 without an explicit affirmative.
 
 ---
 
-## What Stays the Same
+## Live Runtime Surface
 
-The agent migration is an orchestration change, not a domain change. The following Python modules are unchanged and continue to be used exactly as before:
+The agent architecture is an orchestration change, not a provider- or domain-meaning change. The live runtime surface is intentionally small:
 
 | Module | Used by |
 |---|---|
-| `domain/types.py` | JSON contract reference for all agents |
-| `pipeline/constraint_builder.py` | Orchestrator (builds constraints before spawning Reconstructor) |
-| `pipeline/validator.py` | Validator Agent |
-| `adapters/clockify/adapter.py` | Push Agent |
+| `skill/SKILL.md` | Orchestrator contract and stage routing |
+| `.claude/agents/clockify-timesheet/ct-parser.md` | Parser Agent |
+| `.claude/agents/clockify-timesheet/ct-reconstructor.md` | Reconstructor Agent |
+| `.claude/agents/clockify-timesheet/ct-validator.md` | Validator Agent |
+| `.claude/agents/clockify-timesheet/ct-push.md` | Push Agent |
 | `skill/scripts/push_clockify.py` | Push Agent |
 | `skill/scripts/generate_timesheet.py` | Push Agent |
-| `config/schedule_defaults.json` | Orchestrator reads this to build constraints |
+| `skill/config/schedule_defaults.json` | Reconstructor and Push Agent |
 
-All V1 rules in `skill/SKILL.md` remain binding. All ADR decisions (ADR-001 through ADR-006) remain in effect. The agent architecture is an implementation change, not a policy change.
+All V1 rules in `skill/SKILL.md` remain binding. The agent architecture changes execution shape, not the underlying policy decisions.
 
 ---
 

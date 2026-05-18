@@ -11,6 +11,7 @@ The validation stage decides whether a generated proposal is acceptable, warning
 - inspect proposal coherence
 - check constraint consistency
 - surface ambiguity and warning signals
+- warn on suspicious project assignment patterns without forcing provider-specific logic into the core model
 - require clarification or regeneration
 - block weak output from silently progressing
 
@@ -18,6 +19,7 @@ The validation stage decides whether a generated proposal is acceptable, warning
 
 - a clear acceptance or rejection state
 - warnings where plausibility is weakened but not broken
+- non-blocking project-assignment warnings where tagging looks incomplete or inconsistent
 - clarification-needed signals when context is insufficient
 - a reasoned basis for regeneration or refusal
 
@@ -25,6 +27,7 @@ The validation stage decides whether a generated proposal is acceptable, warning
 
 - silently approve weak output
 - invent missing work to make totals look nicer
+- depend on raw narrative evidence that is not present in the proposal it receives
 - override user authority
 - redefine provider payload rules
 

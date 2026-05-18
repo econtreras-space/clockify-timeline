@@ -176,39 +176,41 @@ Issues discovered during the first real end-to-end push run. Both caused Stage 5
 
 A broader review of the project following the first real run. These are structural gaps between what is documented and what is actually wired together. This section exists as a reference guideline — not as an implementation task list — to inform the ongoing portability work.
 
-### A. Technical Gaps
+### A. Technical Gap Snapshot
+
+This section started as a list of pre-agent gaps. Several of those items are now resolved by the live orchestrator and subagent setup. The list below keeps only the remaining architectural lessons so the history stays useful without describing the current implementation inaccurately.
 
 Gaps are listed in order of severity. Each entry describes what exists, what is missing, and the consequence if left unaddressed.
 
-#### Gap 1 — No unified skill orchestration entry point
+#### Gap 1 — Keep the unified orchestration entry point honest
 
-SKILL.md defines five explicit stages (parse → reconstruct → validate → confirm → push), but no Claude Code skill file ties them together as an executable flow. The stages exist as documented intent. There is no `clockify-timesheet` entry point that routes through the full pipeline in sequence.
+`skill/SKILL.md` now acts as the executable orchestration entry point. The remaining risk is drift between that live contract, the subagent prompts, and the surrounding docs.
 
-**Consequence:** Each stage runs in isolation or mentally. The skill cannot be invoked end-to-end by a user without manual navigation through each stage.
+**Consequence if ignored:** The architecture looks stage-based on paper but behaves inconsistently in practice.
 
-#### Gap 2 — Python runtime dependencies are undeclared at the skill level
+#### Gap 2 — Python runtime dependencies are still lightweight and explicit only at the script layer
 
-`skill/scripts/requirements.txt` lists only `openpyxl` — discovered at runtime, not upfront. The `skill/` modules (`domain/`, `analyzer/`, `pipeline/`, `adapters/`) import each other, but the Python path setup and venv activation are entirely undocumented. No install step exists in `README.md`, `SKILL.md`, or any onboarding document.
+The agent-oriented design keeps Python limited to push/export, which is healthier than the older mixed model. The remaining portability concern is still onboarding clarity around optional script dependencies.
 
-**Consequence:** Any fresh environment fails before Stage 2 runs. A developer following the docs cannot reproduce the setup independently.
+**Consequence if ignored:** Fresh environments may still stumble at the provider/export edge even if the Claude-side pipeline is correct.
 
-#### Gap 3 — Prompt contracts are not integrated into live Claude calls
+#### Gap 3 — Prompt contracts must keep matching the live agent prompts
 
-`semantic_extractor.py` and `temporal_reconstructor.py` contain prompt templates (`EXTRACTION_PROMPT`, `RECONSTRUCTION_PROMPT`). These are string constants, not wired calls. Claude is not being invoked by these scripts — they are placeholders awaiting integration.
+The prompt contracts now live as documentation while the live behavior runs through the subagent prompt files. The risk is no longer “not integrated at all,” but rather “quietly divergent over time.”
 
-**Consequence:** Stage 2 (reconstruct) is architecturally described but not executing. The domain model is populated manually or not at all during a real run.
+**Consequence if ignored:** The wiki becomes authoritative in appearance while the real agent behavior drifts elsewhere.
 
-#### Gap 4 — Proposal formatter is stubbed, not implemented
+#### Gap 4 — Proposal rendering belongs to the orchestrator contract
 
-`skill/pipeline/proposal_formatter.py` exists but contains no formatting logic. Stage 4 (confirm) depends on a human-readable proposal being generated from a `TimelineProposal` object.
+The current V1 flow renders proposals inline rather than through a Python formatter module. The remaining risk is inconsistency in how proposals are displayed for review and correction.
 
-**Consequence:** The confirm loop cannot function in its current state. A user cannot review or approve a proposal that was never rendered.
+**Consequence if ignored:** Confirmation remains technically possible, but review quality becomes uneven and harder to trust.
 
-#### Gap 5 — Clarification loop has no implementation path
+#### Gap 5 — Clarification must remain a real continuation path
 
-`validator.py` correctly returns `NEEDS_CLARIFICATION` with a list of questions when the proposal is ambiguous. No mechanism exists to surface those questions to the user, collect a response, and re-enter Stage 2 with enriched context.
+The current orchestrator contract now includes the clarification loop. The remaining risk is losing fidelity between clarification answers, reconstructed narrative, and the next validation pass.
 
-**Consequence:** `NEEDS_CLARIFICATION` is effectively a terminal state when it should be a continuation. The system drops the pipeline instead of asking.
+**Consequence if ignored:** Clarification exists nominally, but the enriched retry path becomes unreliable or hard to reason about.
 
 #### Gap 6 — Adapter payload contract is implicit
 

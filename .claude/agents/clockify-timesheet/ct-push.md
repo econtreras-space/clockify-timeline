@@ -23,14 +23,29 @@ You will receive:
 
 ### Step 1 — Translate to provider payload
 
+Read `<project_root>/skill/config/schedule_defaults.json` and use its `projects` mapping to translate each non-null block `project_key` into a Clockify project ID.
+
 Filter the proposal blocks:
 - Exclude any block where `is_constraint: true` (standup, lunch break are not billable time entries)
 - Exclude any block where `hours == 0`
 
 For each remaining block, produce an entry:
 ```json
-{ "date": "YYYY-MM-DD", "start": "HH:MM", "end": "HH:MM", "description": "...", "hours": 1.5 }
+{
+  "date": "YYYY-MM-DD",
+  "start": "HH:MM",
+  "end": "HH:MM",
+  "description": "...",
+  "hours": 1.5,
+  "project_id": "clockify-project-id-or-null"
+}
 ```
+
+Rules:
+- If the block has a non-null `project_key` and the config contains `projects.<project_key>.clockify_project_id`, set that as `project_id`
+- If the block has `project_key: null` or no matching config entry, set `"project_id": null`
+- Never emit internal `project_key` values into the provider payload
+- Compute `summary.total_hours` from the filtered provider entries only, not from excluded constraint blocks
 
 Wrap all entries in the V1 envelope:
 ```json
@@ -38,7 +53,7 @@ Wrap all entries in the V1 envelope:
   "entries": [...],
   "summary": {
     "total_days": 1,
-    "total_hours": 8.0,
+    "total_hours": 7.5,
     "date_range": "YYYY-MM-DD to YYYY-MM-DD"
   }
 }

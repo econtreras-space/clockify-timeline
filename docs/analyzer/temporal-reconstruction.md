@@ -40,15 +40,28 @@ It should:
 
 It should not pretend that the result is a factual recording of observed activity.
 
+## Explicit Hour Budgets
+
+When the narrative contains explicit per-project hour statements (e.g. "Hours: 3.5 hs" under a project section), those values become **hard budgets** that override proportional allocation. The schedule gaps determine only *where* blocks are placed, not *how long* they are.
+
+When a project has an explicit budget, its `AvailableGap` surface is `budget - constraint_hours`, where `constraint_hours` is the sum of any constraint blocks attributed to that project via the schedule config's `project_key` field. The remaining gap allocation covers the balance of the budget exactly.
+
+If the sum of all stated budgets falls below `productive_hours_per_day`, the gap is reported as `shortfall_hours` — an informational note, not an error. Blocks are never expanded to fill it.
+
 ## Coverage Target
 
-The proposal must always fill the full `productive_hours_per_day` configured in `schedule_defaults.json`.
+`productive_hours_per_day` is a configurable target surface, not a mandatory fill command.
 
-Available gap surface = `productive_hours_per_day` minus fixed constraint time (standup, etc.). If narrative work units account for less than the full available surface after initial distribution, expand existing blocks proportionally using `relative_weight` until all gaps are filled. Higher-weight blocks absorb more of the expansion.
+Available gap surface = configured work surface minus fixed constraints. If narrative work units account for less than that surface after initial distribution, the analyzer may expand already-described work proportionally using `relative_weight` when that still feels like a plausible continuation of the same day.
 
-This is not fabrication. Expanding described work blocks is consistent with ADR-004 (Plausibility Over Precision) — the developer was hired to work their contracted hours; undescribed time is absorbed into known work, not invented as new tasks. Leaving gaps empty silently under-reports hours, which defeats the purpose of the tool.
+This expansion is optional and bounded:
 
-Exception: if the user explicitly states they worked a shorter day (half-day, left early, etc.), honour that and do not fill to the target.
+- it must stay attached to described work
+- it must not force every day to reach the configured target
+- it must yield to explicit user-stated hours when present
+- it must yield to uncertainty and clarification when support is weak
+
+Shorter valid days are acceptable when the narrative support is meaningfully partial or when the user clearly states their hours.
 
 ## How Reconstruction Proceeds
 

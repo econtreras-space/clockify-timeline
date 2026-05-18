@@ -15,7 +15,7 @@ These rules are non-negotiable. They bind both the orchestrator and every subage
 
 - **No invented missing days.** Do not reconstruct a workday for which there is no narrative context. (ADR-001, ADR-004)
 - **No fabricated work.** Every timeline block must trace back to something described or clearly implied by the narrative. (ADR-004)
-- **Schedule defaults are not architecture.** The time-slot template in `config/schedule_defaults.json` is a starting point, not a permanent rule. (ADR-005)
+- **Schedule defaults are not architecture.** The time-slot template in `config/schedule_defaults.json` is a starting point, not a permanent rule.
 - **User confirmation is mandatory.** Never push to Clockify without an explicit "yes" from the user. (ADR-003)
 - **User authority is final.** If the user corrects, modifies, or rejects any part of a proposal, accept it without argument. (ADR-001)
 
@@ -37,6 +37,8 @@ cat > ~/.config/clockify/credentials.json << 'EOF'
 EOF
 chmod 600 ~/.config/clockify/credentials.json
 ```
+
+Leave `project_id` as `null` if you want per-block project mapping or projectless entries. If set, it should be treated as a backwards-compatible fallback only when a provider payload entry omits `project_id`.
 
 Never print, log, or display the API key.
 
@@ -112,7 +114,7 @@ Stage 4 runs entirely in the orchestrator's context.
 
 **Display the proposal:**
 
-Use `pipeline/proposal_formatter.py:format_proposal()` output to render the proposal for review. If the validation outcome was `warn`, include all warnings prominently at the top.
+Render the proposal inline in the conversation. Show each day's blocks in chronological order, and if the validation outcome was `warn`, include all warnings prominently at the top.
 
 Ask explicitly:
 
@@ -138,6 +140,8 @@ Never proceed to Stage 5 without an explicit affirmative.
 - The absolute path to the project root (e.g. `/Users/edgarcontreras/Documents/space-chapters/Automations/clockify-timeline`)
 
 **What you receive:** `{ "entries_pushed", "entries_failed", "timesheet_saved", "timesheet_path", "errors" }`
+
+`@ct-push` is responsible for translating any block-level `project_key` values into Clockify project IDs using `skill/config/schedule_defaults.json`. Blocks without a clear project remain projectless and are still valid to push.
 
 **Report to the user:** total pushed, total failed, whether the timesheet backup was saved, and any errors.
 

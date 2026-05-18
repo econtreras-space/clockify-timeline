@@ -72,15 +72,20 @@ The JSON file written to `/tmp/clockify_entries.json` before calling `push_clock
       "start":       "HH:MM",
       "end":         "HH:MM",
       "description": "Block description",
-      "hours":       1.5
+      "hours":       1.5,
+      "project_id":  "clockify-project-id-or-null"
     }
   ]
 }
 ```
 
+`project_id` is provider-facing. It is derived at the adapter boundary from an internal block `project_key` and may be `null` for projectless entries.
+
 Rules enforced by `push_clockify.py`:
 - Entries with `description` equal to `"lunch break"` (case-insensitive) are silently skipped.
 - Entries with `hours` ≤ 0 are silently skipped.
+- If an entry includes `"project_id": null`, it is pushed without a Clockify project.
+- If an entry omits `project_id`, the push script may fall back to the credentials-level default project for backwards compatibility.
 - All other entries are submitted in order, 300ms apart.
 
 `generate_timesheet.py` additionally reads an optional top-level `"summary"` key:
@@ -97,3 +102,4 @@ Rules enforced by `push_clockify.py`:
 ```
 
 `summary` is optional — the XLSX generator falls back gracefully when it is absent.
+When present, `summary.total_hours` should reflect provider-facing hours only, after excluded constraint blocks have been removed.

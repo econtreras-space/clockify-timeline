@@ -46,7 +46,7 @@ EOF
 chmod 600 ~/.config/clockify/credentials.json
 ```
 
-`project_id` is optional — if set, all entries are assigned to that project. Set `timezone` to your local timezone (e.g. `America/New_York`, `Europe/Madrid`).
+`project_id` is optional. Leave it `null` if you want the adapter to decide per entry whether a block maps to a configured project or stays projectless. If set, it acts only as a backwards-compatible fallback when a provider payload entry omits `project_id`. Set `timezone` to your local timezone (e.g. `America/New_York`, `Europe/Madrid`).
 
 ### 3. Validate the setup
 
@@ -96,14 +96,15 @@ Edit it to match your actual schedule. These are defaults, not fixed rules.
 ```
 skill/                  Main skill and all components
 ├── SKILL.md            Orchestration layer — how the pipeline runs
-├── domain/types.py     Core data shapes (NarrativeInput, WorkUnit, TimelineProposal, …)
 ├── config/             Schedule defaults
-├── analyzer/           Semantic extraction and temporal reconstruction
-├── pipeline/           Constraint builder, validator, proposal formatter
-├── adapters/           Clockify adapter and calendar stub
-└── scripts/            Low-level API scripts (push, generate XLSX, validate creds)
+├── scripts/            Low-level API scripts (push, generate XLSX, validate creds)
 
 docs/                   Architecture and design documentation
+.claude/agents/clockify-timesheet/
+├── ct-parser.md         Parse stage prompt
+├── ct-reconstructor.md  Reconstruct stage prompt
+├── ct-validator.md      Validate stage prompt
+└── ct-push.md           Push stage prompt
 example/                Sample JSON output files
 ```
 
