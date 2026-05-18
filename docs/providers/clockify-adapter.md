@@ -1,0 +1,59 @@
+# Clockify Adapter
+
+Back to [Docs Home](../README.md), [Architectural Principles](../blueprint/architectural-principles.md), [Architecture Decisions](../decisions/README.md), and [Provider Architecture](./provider-architecture.md).
+
+## Purpose
+
+The Clockify adapter is the concrete provider adapter for the current V1 target.
+
+Its role is to translate an accepted internal [TimelineProposal](../domain/entities/timeline-proposal.md) into Clockify-compatible requests without allowing Clockify’s schema to reshape the internal model.
+
+## What It Owns
+
+The Clockify adapter should own:
+
+- transformation of internal timeline structures into Clockify entry payloads
+- provider-specific field mapping such as workspace, project, tag, or billable metadata
+- authentication concerns
+- request formatting and submission behavior
+- handling of Clockify-specific validation or request errors
+
+## What It Must Not Own
+
+The Clockify adapter must not own:
+
+- what a `WorkUnit` means
+- whether a proposed day is plausible
+- whether the user has confirmed the result
+- the canonical structure of `TimelineBlock` or `TimelineProposal`
+
+Those decisions belong upstream.
+
+## Input and Output Boundary
+
+The adapter takes internal output after:
+
+- semantic interpretation,
+- temporal reconstruction,
+- uncertainty handling,
+- and human confirmation
+
+have already occurred.
+
+It produces a Clockify-shaped [ProviderPayload](../domain/entities/provider-payload.md) suitable for downstream submission.
+
+## V1 Position
+
+Clockify is the first concrete target, but it is still only a target.
+
+The architecture should treat it as:
+
+- important for delivery,
+- specific in its request format,
+- but non-authoritative with respect to core domain meaning.
+
+## Why This Matters
+
+If Clockify fields were allowed to shape the internal model directly, future provider support would become harder and internal reasoning would become less coherent.
+
+The adapter boundary protects against that drift.

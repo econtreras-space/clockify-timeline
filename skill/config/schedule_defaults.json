@@ -1,0 +1,35 @@
+{
+  "_comment": "Default workday shape. Override per-user in credentials.json or a local schedule.json.",
+  "workday": {
+    "start": "09:00",
+    "end": "18:00",
+    "timezone": "America/Montevideo"
+  },
+  "fixed_constraints": [
+    {
+      "label": "Daily standup",
+      "type": "fixed_meeting",
+      "start": "11:00",
+      "end": "11:30",
+      "recurrence": "weekdays",
+      "is_hard": true
+    },
+    {
+      "label": "Lunch break",
+      "type": "lunch_break",
+      "start": "12:30",
+      "end": "13:30",
+      "recurrence": "weekdays",
+      "is_hard": true,
+      "exclude_from_provider": true
+    }
+  ],
+  "available_gaps": [
+    { "label": "Morning block",     "start": "09:00", "end": "11:00" },
+    { "label": "Pre-lunch block",   "start": "11:30", "end": "12:30" },
+    { "label": "Afternoon block 1", "start": "13:30", "end": "15:30" },
+    { "label": "Afternoon block 2", "start": "15:30", "end": "17:00" },
+    { "label": "End of day block",  "start": "17:00", "end": "18:00" }
+  ],
+  "productive_hours_per_day": 8.0
+}

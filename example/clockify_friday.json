@@ -1,0 +1,51 @@
+{
+  "entries": [
+    {
+      "date": "2026-05-08",
+      "start": "09:00",
+      "end": "11:00",
+      "description": "Hi team, sharing my update from yesterday. Today I’ll continue working on these remaining details; Trending/Vetted listings",
+      "hours": 2
+    },
+    {
+      "date": "2026-05-08",
+      "start": "11:00",
+      "end": "11:30",
+      "description": "Added maxUpdatesPerMinute: 120 to the token-details stream only when called from coin-list.; Removed native tokens from Trending and Vetted listings.",
+      "hours": 0.5
+    },
+    {
+      "date": "2026-05-08",
+      "start": "11:30",
+      "end": "12:30",
+      "description": "Currently investigating a socket disconnection bug from the listing after ~5 minutes of streaming. I haven’t been able to reproduce it locally yet, so I’m sending fixes to UAT to keep testing possible solutions. We know it only happens with token-detail, so it seems to be isolated to that specific flow.; Performance call x2.",
+      "hours": 1
+    },
+    {
+      "date": "2026-05-08",
+      "start": "13:30",
+      "end": "15:30",
+      "description": "New listing.; Continued working on the events for this listing.",
+      "hours": 2
+    },
+    {
+      "date": "2026-05-08",
+      "start": "15:30",
+      "end": "17:00",
+      "description": "Increased the number of elements displayed per page to 50 items per column. The platform started crashing, so we’ve been applying several performance improvements on the React side to prevent it. We managed to stop the crashes, but we’re still noticing some slow navigation behavior, so we’ll continue working on performance improvements over the next few days.; Filter combinations.",
+      "hours": 1.5
+    },
+    {
+      "date": "2026-05-08",
+      "start": "17:00",
+      "end": "17:30",
+      "description": "Improve performance from React side; Continue working on updates for some token card components, since I’m seeing updates in MTT. I’m debugging whether the issue is on our side, possibly in a data mapping causing incorrect values.",
+      "hours": 0.5
+    }
+  ],
+  "summary": {
+    "total_days": 1,
+    "total_hours": 7.5,
+    "date_range": "2026-05-08 to 2026-05-08"
+  }
+}
