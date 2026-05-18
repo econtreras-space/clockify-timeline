@@ -119,7 +119,6 @@ def main():
         "email": user_email,
         "workspace": ws_name,
         "key_preview": key_preview,
-        "timezone": creds.get("timezone", "America/Montevideo (default)")
     }
     print(json.dumps(result, indent=2))
 

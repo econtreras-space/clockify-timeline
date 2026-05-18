@@ -85,7 +85,6 @@ Rules enforced by `push_clockify.py`:
 - Entries with `description` equal to `"lunch break"` (case-insensitive) are silently skipped.
 - Entries with `hours` ≤ 0 are silently skipped.
 - If an entry includes `"project_id": null`, it is pushed without a Clockify project.
-- If an entry omits `project_id`, the push script may fall back to the credentials-level default project for backwards compatibility.
 - All other entries are submitted in order, 300ms apart.
 
 `generate_timesheet.py` additionally reads an optional top-level `"summary"` key:

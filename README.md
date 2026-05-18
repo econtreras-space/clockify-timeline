@@ -46,7 +46,7 @@ EOF
 chmod 600 ~/.config/clockify/credentials.json
 ```
 
-`project_id` is optional. Leave it `null` if you want the adapter to decide per entry whether a block maps to a configured project or stays projectless. If set, it acts only as a backwards-compatible fallback when a provider payload entry omits `project_id`. Set `timezone` to your local timezone (e.g. `America/New_York`, `Europe/Madrid`).
+`project_id` is optional legacy config and is not used by the provider adapter for V1 routing. Leave it `null`. Per-entry project mapping happens from internal `project_key` values through `skill/config/schedule_defaults.json`, and entries may remain projectless. Set `timezone` to your local timezone (e.g. `America/New_York`, `Europe/Madrid`).
 
 ### 3. Validate the setup
 

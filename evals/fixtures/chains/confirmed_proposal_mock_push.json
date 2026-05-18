@@ -1,0 +1,51 @@
+{
+  "name": "chain_confirmed_proposal_mock_push",
+  "steps": [
+    {
+      "agent": "ct-push",
+      "input": {
+        "proposal": {
+          "date": "2026-05-17",
+          "needs_clarification": false,
+          "clarification_questions": [],
+          "blocks": [
+            {
+              "label": "Aura QA",
+              "description": "Verified Aura billing flow",
+              "start": "09:00",
+              "end": "11:00",
+              "hours": 2.0,
+              "confidence": 0.9,
+              "is_constraint": false,
+              "project_key": "aura",
+              "category": "review"
+            },
+            {
+              "label": "Daily standup",
+              "description": "Team standup meeting",
+              "start": "11:00",
+              "end": "11:30",
+              "hours": 0.5,
+              "confidence": 1.0,
+              "is_constraint": true,
+              "project_key": null,
+              "category": "meeting"
+            }
+          ],
+          "total_hours": 2.5,
+          "validation_state": "pending"
+        }
+      },
+      "expected": {
+        "entries_pushed": 1,
+        "entries_failed": 0
+      },
+      "checks": [
+        "provider_payload_schema",
+        "provider_summary_matches_entries",
+        "no_constraints_in_payload"
+      ]
+    }
+  ],
+  "tags": ["happy-path", "smoke"]
+}

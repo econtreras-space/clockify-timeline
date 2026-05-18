@@ -1,0 +1,51 @@
+{
+  "agent": "ct-validator",
+  "name": "validator_warn_mixed_project_assignment",
+  "input": {
+    "date": "2026-05-15",
+    "needs_clarification": false,
+    "clarification_questions": [],
+    "blocks": [
+      {
+        "label": "Daily standup",
+        "description": "Team standup meeting",
+        "start": "11:00",
+        "end": "11:30",
+        "hours": 0.5,
+        "confidence": 1.0,
+        "is_constraint": true,
+        "project_key": null,
+        "category": "meeting"
+      },
+      {
+        "label": "Aura QA",
+        "description": "Verified Aura billing flow",
+        "start": "09:00",
+        "end": "11:00",
+        "hours": 2.0,
+        "confidence": 0.85,
+        "is_constraint": false,
+        "project_key": "aura",
+        "category": "review"
+      },
+      {
+        "label": "General review",
+        "description": "Reviewed open pull requests and bug notes",
+        "start": "13:30",
+        "end": "18:00",
+        "hours": 4.5,
+        "confidence": 0.85,
+        "is_constraint": false,
+        "project_key": null,
+        "category": "review"
+      }
+    ],
+    "total_hours": 7.0,
+    "validation_state": "pending"
+  },
+  "expected": {
+    "outcome": "warn"
+  },
+  "checks": [],
+  "tags": ["edge", "regression"]
+}

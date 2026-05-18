@@ -1,0 +1,36 @@
+{
+  "name": "chain_parser_reconstructor_validator_clarification",
+  "steps": [
+    {
+      "agent": "ct-parser",
+      "input": {
+        "narrative": "2026-05-17: Worked on some stuff and handled a few random tasks.",
+        "timezone": "America/Montevideo"
+      },
+      "expected": [
+        {
+          "date": "2026-05-17"
+        }
+      ]
+    },
+    {
+      "agent": "ct-reconstructor",
+      "input_from": "parser_first",
+      "expected": {
+        "needs_clarification": true,
+        "validation_state": "pending"
+      },
+      "checks": [
+        "clarification_requires_empty_blocks"
+      ]
+    },
+    {
+      "agent": "ct-validator",
+      "input_from": "previous",
+      "expected": {
+        "outcome": "needs_clarification"
+      }
+    }
+  ],
+  "tags": ["edge", "smoke"]
+}

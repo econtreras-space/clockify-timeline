@@ -38,7 +38,7 @@ EOF
 chmod 600 ~/.config/clockify/credentials.json
 ```
 
-Leave `project_id` as `null` if you want per-block project mapping or projectless entries. If set, it should be treated as a backwards-compatible fallback only when a provider payload entry omits `project_id`.
+Leave `project_id` as `null`. V1 project routing happens per block through `project_key` mapping in `skill/config/schedule_defaults.json`, and valid provider entries may remain projectless.
 
 Never print, log, or display the API key.
 

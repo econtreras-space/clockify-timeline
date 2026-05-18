@@ -1,0 +1,29 @@
+{
+  "name": "chain_reconstructor_to_validator_happy",
+  "steps": [
+    {
+      "agent": "ct-reconstructor",
+      "input": {
+        "narrative_input": {
+          "date": "2026-05-15",
+          "timezone": "America/Montevideo",
+          "raw_text": "Worked on Aura billing QA, documented the fix, and reviewed the release notes."
+        }
+      },
+      "expected": {
+        "needs_clarification": false,
+        "validation_state": "pending"
+      },
+      "checks": [
+        "blocks_within_workday",
+        "total_hours_match"
+      ]
+    },
+    {
+      "agent": "ct-validator",
+      "input_from": "previous",
+      "allowed_outcomes": ["pass", "warn"]
+    }
+  ],
+  "tags": ["happy-path", "smoke"]
+}

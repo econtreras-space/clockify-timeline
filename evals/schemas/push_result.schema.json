@@ -1,0 +1,15 @@
+{
+  "type": "object",
+  "required": ["entries_pushed", "entries_failed", "timesheet_saved", "timesheet_path", "errors"],
+  "properties": {
+    "entries_pushed": { "type": "integer", "minimum": 0 },
+    "entries_failed": { "type": "integer", "minimum": 0 },
+    "timesheet_saved": { "type": "boolean" },
+    "timesheet_path": { "type": "string" },
+    "errors": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": false
+}
