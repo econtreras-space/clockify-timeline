@@ -57,3 +57,43 @@ The architecture should treat it as:
 If Clockify fields were allowed to shape the internal model directly, future provider support would become harder and internal reasoning would become less coherent.
 
 The adapter boundary protects against that drift.
+
+---
+
+## V1 Payload Schema
+
+The JSON file written to `/tmp/clockify_entries.json` before calling `push_clockify.py` or `generate_timesheet.py` must match this exact top-level shape. Both scripts read `data["entries"]` directly — nested structures will cause a `KeyError`.
+
+```json
+{
+  "entries": [
+    {
+      "date":        "YYYY-MM-DD",
+      "start":       "HH:MM",
+      "end":         "HH:MM",
+      "description": "Block description",
+      "hours":       1.5
+    }
+  ]
+}
+```
+
+Rules enforced by `push_clockify.py`:
+- Entries with `description` equal to `"lunch break"` (case-insensitive) are silently skipped.
+- Entries with `hours` ≤ 0 are silently skipped.
+- All other entries are submitted in order, 300ms apart.
+
+`generate_timesheet.py` additionally reads an optional top-level `"summary"` key:
+
+```json
+{
+  "entries": [...],
+  "summary": {
+    "total_days":   1,
+    "total_hours":  8.0,
+    "date_range":   "YYYY-MM-DD to YYYY-MM-DD"
+  }
+}
+```
+
+`summary` is optional — the XLSX generator falls back gracefully when it is absent.

@@ -79,6 +79,7 @@ The skill operates in five explicit stages. Each stage has a clear input, output
 - Never reconstruct an entire unreported weekday.
 - Surface confidence and ambiguity explicitly — do not hide uncertainty.
 - Prefer operational noise (realistic fragmentation) over robotic uniform blocks.
+- **Fill the full available surface.** After placing narrative work units into blocks, compute the total allocated hours (including fixed constraints like standup). If the total falls short of `productive_hours_per_day` from `config/schedule_defaults.json`, distribute the remaining surface proportionally across existing work blocks weighted by `relative_weight`. Higher-weight blocks absorb more of the expansion. Do not leave available gaps empty unless the user explicitly reported a shorter day. Expanding described work is not fabrication — it is plausible distribution of time the developer was known to be working.
 
 ---
 
@@ -98,7 +99,7 @@ The skill operates in five explicit stages. Each stage has a clear input, output
 
 **What validation checks:**
 - No empty proposals (no invented days).
-- Total hours within plausible bounds.
+- Total hours equal `productive_hours_per_day` (±0.25h rounding tolerance). A proposal below this threshold is a validation warning unless the user explicitly stated a shorter day.
 - No blocks overlapping hard constraints (especially lunch break).
 - Low-confidence block ratio.
 - Blocks within workday boundary.
@@ -132,14 +133,23 @@ The skill operates in five explicit stages. Each stage has a clear input, output
 **Behavior:**
 1. Translate the proposal into a `ProviderPayload` using `adapters/clockify/adapter.py:to_provider_payload()`.
 2. Serialize to the dict format using `adapters/clockify/adapter.py:payload_to_json_dict()`.
-3. Save the payload JSON to `/home/claude/clockify_entries.json`.
-4. Run the push script via `adapters/clockify/client.py:push()`:
+3. Save the payload JSON to `/tmp/clockify_entries.json`. The file must match the V1 schema documented in `docs/providers/clockify-adapter.md` — a flat top-level `"entries"` array. Do not nest under `"payload"` or any other key:
+
+```json
+{
+  "entries": [
+    { "date": "YYYY-MM-DD", "start": "HH:MM", "end": "HH:MM", "description": "...", "hours": 1.5 }
+  ],
+  "summary": { "total_days": 1, "total_hours": 8.0, "date_range": "..." }
+}
+```
+4. Run the push script:
    ```bash
-   python3 skill/scripts/push_clockify.py /home/claude/clockify_entries.json
+   python3 /Users/edgarcontreras/Documents/space-chapters/Automations/clockify-timeline/skill/scripts/push_clockify.py /tmp/clockify_entries.json
    ```
 5. Generate the XLSX backup:
    ```bash
-   python3 skill/scripts/generate_timesheet.py /home/claude/clockify_entries.json /mnt/user-data/outputs/timesheet.xlsx
+   python3 /Users/edgarcontreras/Documents/space-chapters/Automations/clockify-timeline/skill/scripts/generate_timesheet.py /tmp/clockify_entries.json ~/Desktop/timesheet.xlsx
    ```
 6. Report results: total pushed, total failed, any failed entries.
 

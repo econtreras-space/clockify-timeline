@@ -31,5 +31,9 @@
     { "label": "Afternoon block 2", "start": "15:30", "end": "17:00" },
     { "label": "End of day block",  "start": "17:00", "end": "18:00" }
   ],
-  "productive_hours_per_day": 8.0
+  "productive_hours_per_day": 8.0,
+  "projects": {
+    "aura": "asdadasda",
+    "asda": "asd"
+  }
 }

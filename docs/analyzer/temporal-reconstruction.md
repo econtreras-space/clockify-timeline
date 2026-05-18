@@ -40,6 +40,16 @@ It should:
 
 It should not pretend that the result is a factual recording of observed activity.
 
+## Coverage Target
+
+The proposal must always fill the full `productive_hours_per_day` configured in `schedule_defaults.json`.
+
+Available gap surface = `productive_hours_per_day` minus fixed constraint time (standup, etc.). If narrative work units account for less than the full available surface after initial distribution, expand existing blocks proportionally using `relative_weight` until all gaps are filled. Higher-weight blocks absorb more of the expansion.
+
+This is not fabrication. Expanding described work blocks is consistent with ADR-004 (Plausibility Over Precision) — the developer was hired to work their contracted hours; undescribed time is absorbed into known work, not invented as new tasks. Leaving gaps empty silently under-reports hours, which defeats the purpose of the tool.
+
+Exception: if the user explicitly states they worked a shorter day (half-day, left early, etc.), honour that and do not fill to the target.
+
 ## How Reconstruction Proceeds
 
 At a high level, the phase should:

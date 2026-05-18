@@ -134,7 +134,7 @@ class TimelineProposal:
     def is_confirmed(self) -> bool:
         return (
             self.validation is not None
-            and self.validation.outcome == ValidationOutcome.PASS
+            and self.validation.outcome in (ValidationOutcome.PASS, ValidationOutcome.WARN)
         )
 
 
