@@ -27,72 +27,24 @@ This folder explains how the Clockify-oriented reconstruction system is designed
 
 This diagram is intentionally conceptual. It shows the main handoffs without trying to document the current runtime wiring in detail.
 
-```mermaid
-flowchart LR
-    subgraph Inputs["External Inputs and Context"]
-        N["EOD Narrative"]
-        C["Calendar Context"]
-        U["User Config"]
-    end
 
-    subgraph Skill["Skill and Orchestration"]
-        I["Input Intake"]
-        B["Constraint Builder"]
-        O["Flow Orchestration"]
-    end
+## ASCII Diagram
 
-    subgraph Core["Internal Core"]
-        A["Analyzer Engine"]
-        P["Timeline Proposal"]
-        V["Validation and Confidence Signals"]
-    end
+```text
++----------------+        +----------------------+        +-----------+        +-----------+
+| Daily Updates  | -----> | Reconstruction Engine| -----> |  Review   | -----> | Clockify  |
+| plain text in  |        | builds plausible     |        | human     |        | final push|
++----------------+        | timeline draft       |        | approval  |        +-----------+
+                          +----------------------+
+                                     ^
+                                     |
+                         +----------------------+
+                         | Context              |
+                         | calendar + schedule  |
+                         | rules                |
+                         +----------------------+
 
-    subgraph Review["Human Review Loop"]
-        D["Dry-Run Preview"]
-        R["User Review and Corrections"]
-        F["Explicit Confirmation"]
-    end
-
-    subgraph Providers["Provider Adapters"]
-        K["Clockify Adapter"]
-        G["Calendar Integration"]
-        X["Future Provider Adapters"]
-    end
-
-    subgraph External["External Systems"]
-        CK["Clockify API"]
-        GC["Calendar API"]
-        FP["Future Provider Systems"]
-    end
-
-    N --> I
-    C --> G
-    U --> I
-    U --> B
-    G --> B
-    I --> O
-    B --> O
-    O --> A
-    A --> P
-    A --> V
-    P --> D
-    V --> D
-    D --> R
-    R -->|clarify or regenerate| O
-    R -->|accept| F
-    F --> K
-    K --> CK
-    X --> FP
-
-    classDef edge fill:#f6f8fa,stroke:#9aa4b2,color:#111827;
-    classDef core fill:#e8f1ff,stroke:#4f7cff,color:#111827;
-    classDef review fill:#fff4db,stroke:#d99000,color:#111827;
-    classDef provider fill:#e8fff2,stroke:#2c9a62,color:#111827;
-
-    class N,C,U,CK,GC,FP edge;
-    class I,B,O,A,P,V core;
-    class D,R,F review;
-    class K,G,X provider;
+                 if unclear: Review ----> ask / clarify ----> Reconstruction Engine
 ```
 
 ## Reading Tracks
@@ -129,3 +81,5 @@ flowchart LR
 - Clockify-compatible provider output
 
 If you only need one canonical terminology page, start with [Domain Overview](./domain/domain-overview.md).
+
+For a short meeting-friendly walkthrough, see [Presentation Script](./presentation-script.md).
