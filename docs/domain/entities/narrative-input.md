@@ -1,7 +1,5 @@
 # NarrativeInput
 
-Back to [Docs Home](../../README.md), [Architectural Principles](../../blueprint/architectural-principles.md), [Architecture Decisions](../../decisions/README.md), and [Domain Overview](../domain-overview.md).
-
 ## Purpose
 
 `NarrativeInput` is the canonical representation of the human update that starts the reconstruction process.

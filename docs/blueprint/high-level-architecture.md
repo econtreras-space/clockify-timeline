@@ -1,12 +1,14 @@
 # High-Level Architecture
 
-Back to [Docs Home](../README.md), [Architectural Principles](./architectural-principles.md), [Architecture Decisions](../decisions/README.md), and [Domain Overview](../domain/domain-overview.md).
-
 ## Purpose
 
 This page describes the major system areas and their boundaries.
 
-It explains what parts exist, what they own, and how data moves between them at a high level.
+It answers three questions:
+
+- what parts exist
+- what each part owns
+- where the important handoffs happen
 
 ## Major Areas
 
@@ -19,9 +21,9 @@ The system begins with external and user-supplied context such as:
 - user configuration
 - workday rules
 
-These inputs do not yet form a provider payload or a final timeline. They form the raw context surface.
+These inputs form the reasoning surface. They do not yet form a timeline or a provider payload.
 
-### Skill and Orchestration Layer
+### Orchestration Layer
 
 The orchestration layer coordinates:
 
@@ -31,13 +33,11 @@ The orchestration layer coordinates:
 - analyzer invocation,
 - and user-facing review flow.
 
-It is responsible for sequencing, not for redefining the internal domain.
+It owns sequencing, stage boundaries, and runtime delegation. It does not own domain meaning.
 
 ### Analyzer Core
 
-The analyzer is the reasoning center of the system.
-
-It turns internal domain concepts into a plausible [TimelineProposal](../domain/entities/timeline-proposal.md) through:
+The analyzer turns bounded inputs into a plausible, reviewable [TimelineProposal](../domain/entities/timeline-proposal.md) through:
 
 - semantic interpretation,
 - temporal reconstruction,
@@ -46,13 +46,23 @@ It turns internal domain concepts into a plausible [TimelineProposal](../domain/
 
 Behavior details live in the [Analyzer Overview](../analyzer/analyzer-overview.md).
 
+### Review and Confirmation Gate
+
+Generated output passes through a human review boundary before provider handoff.
+
+This area owns:
+
+- proposal preview
+- correction and regeneration
+- explicit confirmation before submission
+
+It prevents downstream adapters from becoming the place where acceptability is decided.
+
 ### Provider Adapter Layer
 
 The provider adapter layer translates internal results into [ProviderPayload](../domain/entities/provider-payload.md) output.
 
-Its responsibility is serialization, formatting, and downstream submission preparation.
-
-Providers are downstream targets, not domain authorities.
+Its responsibility is serialization, formatting, provider-specific validation, and downstream submission preparation.
 
 ### External Systems
 
@@ -68,12 +78,14 @@ These systems supply context or receive serialized output, but they do not defin
 
 - domain concepts are defined in `domain/`
 - analyzer behavior is defined in `analyzer/`
-- blueprint pages describe system shape and flow
+- blueprint pages describe shape, flow, and ownership boundaries
 - provider concerns stay at the edge
-- user authority remains above autonomous progression
+- review and confirmation happen before provider submission
 
-## Architectural Emphasis
+## Handoff Summary
 
-The core architectural choice is that the system models semantic work reconstruction and temporal plausibility internally.
-
-External providers exist to receive transformed output, not to shape the internal meaning of work.
+- inputs and context prepare the day-level reasoning surface
+- orchestration decides when and how stages run
+- the analyzer produces a proposal plus confidence signals
+- the review gate decides whether the proposal can continue
+- provider adapters translate accepted output for external systems

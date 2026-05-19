@@ -1,30 +1,30 @@
-# ADR-006: Daily Coverage Is Mandatory
+# ADR-006: Productive Hours Are Guidance, Not Mandatory Coverage
 
 ## Status
 
-Accepted
+Superseded by the current agent-oriented V1 direction
 
 ## Context
 
-When a developer's EOD narrative describes less work than `productive_hours_per_day`, the reconstruction produces a proposal that totals fewer hours than the contracted workday. For example: a narrative describing 7h of explicit work, on a day configured for 8h productive hours, yields a 7h proposal — leaving one available gap unfilled.
+An earlier direction treated `productive_hours_per_day` as mandatory coverage and required the analyzer to fill every day's available surface.
 
-This is incorrect behavior for a time-tracking tool. The developer was present and working for their full contracted day; the narrative just did not describe every minute in detail.
+That position conflicts with the current V1 boundary:
+
+- the system may allocate time only within described or defensibly implied work
+- schedule defaults are configurable guidance, not permanent architecture
+- shorter valid days must remain possible when the narrative support is partial
 
 ## Decision
 
-Proposals must always cover the full `productive_hours_per_day` configured in `schedule_defaults.json`.
+`productive_hours_per_day` should be treated as a configurable target surface or ceiling, not as a mandatory fill requirement.
 
-After the initial temporal distribution of narrative work units into blocks, the system must compute the remaining unallocated surface and distribute it proportionally across existing work blocks, weighted by `relative_weight`. Higher-weight blocks (those with stronger narrative support) absorb more of the expansion.
+After the initial temporal distribution of narrative work units into blocks, the system may proportionally expand already-described work when that remains plausible within the same workday. Expansion is allowed, but not required.
 
-If the filled total is still short of `productive_hours_per_day` by more than ±0.25h, validation must emit a warning.
-
-The only exception is when the user explicitly reports a shorter day (half-day, early departure, etc.) — in that case, the stated shorter duration is honoured.
+Validation may warn when a day appears partial, but it must not assume the narrative supports full-day coverage if that support is absent.
 
 ## Consequences
 
-- Proposals will consistently total `productive_hours_per_day`, matching what the user actually billed.
-- Expanded blocks remain traceable to the narrative — they are stretched descriptions of real work, not invented tasks.
-- This does not violate ADR-004 (Plausibility Over Precision): expanding described work is plausible distribution, not fabrication.
-- This does not violate the "no fabricated work" rule: no new `WorkUnit` is invented; existing units are given proportionally more time.
-- Users retain authority (ADR-001) to correct any expanded block duration during Stage 4 confirmation.
-- Validation must enforce the coverage floor, not just a ceiling.
+- Proposals may still use bounded expansion when the narrative support is strong.
+- Shorter valid days remain representable without forcing hidden fabrication-by-expansion.
+- Validation should treat low-hour days as warning-worthy or clarification-worthy based on confidence, not as automatic policy failures.
+- User review remains the final authority over whether a partial proposal is acceptable for submission.

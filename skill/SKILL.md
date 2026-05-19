@@ -3,17 +3,19 @@ name: clockify-timesheet
 description: "Reconstruct a plausible work timeline from EOD narrative and push it to Clockify after explicit user confirmation. Triggers: 'push to clockify', 'log my hours', 'timesheet from slack', 'EOD to clockify', 'fill my clockify', 'log this week', or any request to turn Slack EOD updates into time entries. Also triggers when the user pastes EOD messages without mentioning Clockify explicitly."
 ---
 
-# Clockify Timesheet Skill
+# Clockify Timesheet Skill — Orchestrator
 
 Converts end-of-day narrative into a plausible, reviewable timeline proposal, then submits it to Clockify after explicit user confirmation.
 
+This file is the **orchestrator only**. It coordinates four subagents — one per pipeline stage — and handles all direct user interaction (review, corrections, clarification Q&A). The orchestrator does not perform domain reasoning itself: it delegates each bounded task to the appropriate subagent and routes on the result.
+
 ## V1 Rules
 
-These rules are non-negotiable. They are derived from the architectural decisions recorded in `docs/decisions/`.
+These rules are non-negotiable. They bind both the orchestrator and every subagent.
 
 - **No invented missing days.** Do not reconstruct a workday for which there is no narrative context. (ADR-001, ADR-004)
 - **No fabricated work.** Every timeline block must trace back to something described or clearly implied by the narrative. (ADR-004)
-- **Schedule defaults are not architecture.** The time-slot template in `config/schedule_defaults.json` is a starting point, not a permanent rule. (ADR-005)
+- **Schedule defaults are not architecture.** The time-slot template in `config/schedule_defaults.json` is a starting point, not a permanent rule.
 - **User confirmation is mandatory.** Never push to Clockify without an explicit "yes" from the user. (ADR-003)
 - **User authority is final.** If the user corrects, modifies, or rejects any part of a proposal, accept it without argument. (ADR-001)
 
@@ -36,124 +38,112 @@ EOF
 chmod 600 ~/.config/clockify/credentials.json
 ```
 
+Leave `project_id` as `null`. V1 project routing happens per block through `project_key` mapping in `skill/config/schedule_defaults.json`, and valid provider entries may remain projectless.
+
 Never print, log, or display the API key.
 
 ---
 
 ## Pipeline
 
-The skill operates in five explicit stages. Each stage has a clear input, output, and behavioral contract. Do not blend stages.
+The skill operates in five stages. Stages 1, 2, 3, and 5 are handled by dedicated subagents. Stage 4 (confirm) is handled inline by the orchestrator.
 
 ---
 
 ### Stage 1 — Parse
 
-**Input:** Raw narrative text pasted by the user (Slack EOD messages, freeform notes, etc.)
-**Output:** One `NarrativeInput` per reporting day
+**Subagent:** `@ct-parser`
 
-**Behavior:**
-1. Identify the date(s) being reported. Ask if ambiguous.
-2. Read the timezone from `credentials.json` (default: `America/Montevideo`).
-3. Treat each distinct day as a separate `NarrativeInput`. Multi-day inputs produce multiple inputs.
-4. Do not interpret or assign time at this stage — just structure the input.
-5. If there is no narrative for a day (e.g. a missing weekday in a weekly report), **do not fabricate a NarrativeInput for it**. Skip that day and note it explicitly.
+**What to pass:**
+- The raw narrative text from the user
+- The timezone from `~/.config/clockify/credentials.json` (default: `America/Montevideo`)
+
+**What you receive:** `NarrativeInput[]` — a JSON array, one object per distinct reporting day.
+
+**Orchestrator behavior after receiving the result:**
+- If the array is empty, tell the user no reportable days were found and stop.
+- If any entry has `"ambiguous": true`, ask the user to confirm the date for that entry before continuing.
+- Otherwise, proceed to Stage 2 with the full array.
 
 ---
 
-### Stage 2 — Reconstruct (Analyzer)
+### Stage 2 — Reconstruct
 
-**Input:** `NarrativeInput` + `Constraint[]` + `AvailableGap[]` (from `pipeline/constraint_builder.py`)
-**Output:** `TimelineProposal` (draft, not yet validated)
-**Contract:** `docs/prompts/analyzer-contract.md`
+**Subagent:** `@ct-reconstructor`
 
-**Behavior:**
-1. Load schedule constraints and available gaps using `pipeline/constraint_builder.py`.
-2. Optionally fetch calendar constraints via `adapters/calendar/adapter.py` (stub in V1).
-3. **Semantic extraction** — use the prompt template in `analyzer/semantic_extractor.py` to extract `WorkUnit` candidates from the narrative. Do not assign time yet.
-4. **Uncertainty assessment** — use `analyzer/uncertainty.py` to score narrative quality and assess allocation surface. If `should_clarify()` returns True, skip to Stage 3 immediately with a clarification request.
-5. **Temporal reconstruction** — use the prompt template in `analyzer/temporal_reconstructor.py` to distribute `WorkUnit` candidates into `TimelineBlock` allocations within the available gaps.
-6. Assemble the `TimelineProposal` from the resulting blocks.
+**Before spawning:** read `skill/config/schedule_defaults.json` and note the `schedule_config_path` to pass to the subagent.
 
-**Key invariants (from analyzer contract):**
-- Allocate only within described work and available gaps.
-- Never reconstruct an entire unreported weekday.
-- Surface confidence and ambiguity explicitly — do not hide uncertainty.
-- Prefer operational noise (realistic fragmentation) over robotic uniform blocks.
-- **Fill the full available surface.** After placing narrative work units into blocks, compute the total allocated hours (including fixed constraints like standup). If the total falls short of `productive_hours_per_day` from `config/schedule_defaults.json`, distribute the remaining surface proportionally across existing work blocks weighted by `relative_weight`. Higher-weight blocks absorb more of the expansion. Do not leave available gaps empty unless the user explicitly reported a shorter day. Expanding described work is not fabrication — it is plausible distribution of time the developer was known to be working.
+**Spawn one `@ct-reconstructor` per `NarrativeInput`.** For multi-day inputs, spawn them in parallel — each handles one day independently.
+
+**What to pass to each:**
+- The single `NarrativeInput` for that day
+- The absolute path to `skill/config/schedule_defaults.json`
+
+**What you receive:** one `TimelineProposal` per day.
+
+**Orchestrator behavior after receiving all results:**
+- If any proposal has `"needs_clarification": true`, ask the user the `clarification_questions` listed in that proposal. Then re-spawn `@ct-reconstructor` for that day with the original `NarrativeInput` augmented with the user's answers appended to `raw_text`.
+- Once all proposals are returned without clarification flags, proceed to Stage 3.
 
 ---
 
 ### Stage 3 — Validate
 
-**Input:** `TimelineProposal` (draft)
-**Output:** `ValidationState` — one of: `pass`, `warn`, `needs_clarification`, `reject`
-**Contract:** `docs/prompts/validation-contract.md` + `docs/prompts/clarification-contract.md`
+**Subagent:** `@ct-validator`
 
-**Behavior:**
-1. Run `pipeline/validator.py` on the proposal.
-2. Based on the outcome:
-   - **PASS** → proceed to Stage 4.
-   - **WARN** → proceed to Stage 4, but surface all warnings prominently in the review.
-   - **NEEDS_CLARIFICATION** → stop. Use `pipeline/proposal_formatter.py:format_clarification_request()` to generate targeted questions. Wait for user response, then loop back to Stage 2 with the new context added to the narrative.
-   - **REJECT** → do not proceed. Explain the rejection reason clearly. Ask the user to provide better context or skip the day.
+**Spawn one `@ct-validator` per `TimelineProposal`.**
 
-**What validation checks:**
-- No empty proposals (no invented days).
-- Total hours equal `productive_hours_per_day` (±0.25h rounding tolerance). A proposal below this threshold is a validation warning unless the user explicitly stated a shorter day.
-- No blocks overlapping hard constraints (especially lunch break).
-- Low-confidence block ratio.
-- Blocks within workday boundary.
+**What to pass:** the `TimelineProposal` JSON for that day.
+
+**What you receive:** `ValidationState` — `{ "outcome", "warnings", "clarification_questions", "rejection_reason" }`.
+
+**Route on outcome:**
+
+| Outcome | Action |
+|---|---|
+| `pass` | Proceed to Stage 4 |
+| `warn` | Proceed to Stage 4; surface all warnings prominently in the review |
+| `needs_clarification` | Ask the user the listed `clarification_questions`. Then loop back to Stage 2 for that day with enriched narrative. |
+| `reject` | Explain the `rejection_reason` clearly. Ask the user to provide better context or skip the day. Do not proceed. |
 
 ---
 
-### Stage 4 — Confirm
+### Stage 4 — Confirm (inline — no subagent)
 
-**Input:** `TimelineProposal` with attached `ValidationState` (PASS or WARN)
-**Output:** User-approved proposal, or a correction that loops back to Stage 2
-**Contract:** `docs/prompts/proposal-generation.md`
+Stage 4 runs entirely in the orchestrator's context.
 
-**Behavior:**
-1. Use `pipeline/proposal_formatter.py:format_proposal()` to render the proposal for review.
-2. Display the formatted proposal to the user. Include all warnings.
-3. Ask explicitly: **"Does this look right? Reply yes to push to Clockify, or tell me what to change."**
-4. Accept:
-   - **"yes" / "looks good" / confirmation** → proceed to Stage 5.
-   - **Correction or modification** → update the proposal accordingly and re-display for confirmation (may loop back to Stage 2 if changes are significant).
-   - **"skip" / "cancel"** → abort without pushing.
-5. Never proceed to Stage 5 without an explicit affirmative response.
+**Display the proposal:**
+
+Render the proposal inline in the conversation. Show each day's blocks in chronological order, and if the validation outcome was `warn`, include all warnings prominently at the top.
+
+Ask explicitly:
+
+> **Does this look right? Reply yes to push to Clockify, or tell me what to change.**
+
+**Accept these responses:**
+- **"yes" / "looks good" / any clear affirmative** → proceed to Stage 5
+- **A correction or modification** → update the proposal accordingly and re-display. If the change is significant (adding/removing a task, changing a day's structure), re-spawn `@ct-reconstructor` with the corrected narrative. Then re-validate with `@ct-validator` before re-displaying.
+- **"skip" / "cancel" / "no"** → abort without pushing. Acknowledge clearly.
+
+Never proceed to Stage 5 without an explicit affirmative.
 
 ---
 
 ### Stage 5 — Push
 
-**Input:** User-confirmed `TimelineProposal`
-**Output:** Clockify submission result + XLSX backup
-**Contract:** `docs/providers/clockify-adapter.md`
+**Subagent:** `@ct-push`
 
-**Behavior:**
-1. Translate the proposal into a `ProviderPayload` using `adapters/clockify/adapter.py:to_provider_payload()`.
-2. Serialize to the dict format using `adapters/clockify/adapter.py:payload_to_json_dict()`.
-3. Save the payload JSON to `/tmp/clockify_entries.json`. The file must match the V1 schema documented in `docs/providers/clockify-adapter.md` — a flat top-level `"entries"` array. Do not nest under `"payload"` or any other key:
+**Spawn after user confirmation.**
 
-```json
-{
-  "entries": [
-    { "date": "YYYY-MM-DD", "start": "HH:MM", "end": "HH:MM", "description": "...", "hours": 1.5 }
-  ],
-  "summary": { "total_days": 1, "total_hours": 8.0, "date_range": "..." }
-}
-```
-4. Run the push script:
-   ```bash
-   python3 /Users/edgarcontreras/Documents/space-chapters/Automations/clockify-timeline/skill/scripts/push_clockify.py /tmp/clockify_entries.json
-   ```
-5. Generate the XLSX backup:
-   ```bash
-   python3 /Users/edgarcontreras/Documents/space-chapters/Automations/clockify-timeline/skill/scripts/generate_timesheet.py /tmp/clockify_entries.json ~/Desktop/timesheet.xlsx
-   ```
-6. Report results: total pushed, total failed, any failed entries.
+**What to pass:**
+- The confirmed `TimelineProposal` JSON
+- The absolute path to the project root (e.g. `/Users/edgarcontreras/Documents/space-chapters/Automations/clockify-timeline`)
 
-**Dry-run mode:** Pass `dry_run=True` to `client.push()` or append `--dry-run` to preview without submitting.
+**What you receive:** `{ "entries_pushed", "entries_failed", "timesheet_saved", "timesheet_path", "errors" }`
+
+`@ct-push` is responsible for translating any block-level `project_key` values into Clockify project IDs using `skill/config/schedule_defaults.json`. Blocks without a clear project remain projectless and are still valid to push.
+
+**Report to the user:** total pushed, total failed, whether the timesheet backup was saved, and any errors.
 
 ---
 
@@ -167,31 +157,30 @@ The skill operates in five explicit stages. Each stage has a clear input, output
 | Duplicate entry | Script skips and logs a warning. |
 | Network error | Logged per-entry. Batch continues. |
 | Missing narrative for a day | Skip that day. Note it explicitly. Do not invent content. |
-| Narrative too vague to reconstruct | Trigger clarification (Stage 3). Do not guess. |
+| Narrative too vague to reconstruct | Trigger clarification (Stage 2 → 3 loop). Do not guess. |
+| Subagent returns malformed JSON | Log the raw output and ask the user whether to retry or abort. |
 
 ---
 
-## Component Map
+## Subagent Map
+
+| Subagent | File | Stage | Tools | Model |
+|---|---|---|---|---|
+| `ct-parser` | `.claude/agents/clockify-timesheet/ct-parser.md` | 1 — Parse | Read | haiku |
+| `ct-reconstructor` | `.claude/agents/clockify-timesheet/ct-reconstructor.md` | 2 — Reconstruct | Read | sonnet |
+| `ct-validator` | `.claude/agents/clockify-timesheet/ct-validator.md` | 3 — Validate | none | haiku |
+| `ct-push` | `.claude/agents/clockify-timesheet/ct-push.md` | 5 — Push | Bash, Write | haiku |
+
+## File Map
 
 ```
 skill/
-├── SKILL.md                     ← this file — orchestration layer
-├── domain/types.py              ← NarrativeInput, WorkUnit, Constraint, TimelineProposal, etc.
-├── config/schedule_defaults.json ← workday shape (configurable defaults)
-├── analyzer/
-│   ├── semantic_extractor.py    ← narrative → WorkUnit candidates
-│   ├── temporal_reconstructor.py ← WorkUnits → TimelineBlocks
-│   └── uncertainty.py           ← confidence scoring + clarification triggers
-├── pipeline/
-│   ├── constraint_builder.py    ← config + calendar → Constraints + AvailableGaps
-│   ├── validator.py             ← TimelineProposal → ValidationState
-│   └── proposal_formatter.py   ← proposal → human-readable review text
-└── adapters/
-    ├── clockify/
-    │   ├── adapter.py           ← TimelineProposal → Clockify JSON
-    │   └── client.py           ← push script wrapper
-    └── calendar/
-        └── adapter.py          ← calendar events → Constraints (V1 stub)
+├── SKILL.md                     ← this file — orchestrator
+├── config/
+│   └── schedule_defaults.json   ← workday shape, read by ct-reconstructor
+└── scripts/
+    ├── push_clockify.py         ← executed by ct-push (Clockify API)
+    ├── generate_timesheet.py    ← executed by ct-push (XLSX/CSV backup)
+    ├── validate_credentials.py  ← run on startup to verify API key
+    └── requirements.txt         ← openpyxl (optional, for XLSX output)
 ```
-
-Existing `scripts/` are unchanged. The adapter layer wraps them.

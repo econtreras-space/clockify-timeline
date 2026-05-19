@@ -1,12 +1,10 @@
 # Operational Pipeline
 
-Back to [Docs Home](../README.md), [Architectural Principles](./architectural-principles.md), [Architecture Decisions](../decisions/README.md), and [Domain Overview](../domain/domain-overview.md).
-
 ## Purpose
 
 This page describes how work flows through the system from narrative input to provider handoff.
 
-It explains sequence and responsibility without taking ownership of domain definitions.
+It is the sequence view of the system. For current runtime delegation, see [Agent-Based Orchestration](./agent-orchestration.md).
 
 ## End-to-End Flow
 
@@ -21,18 +19,16 @@ It explains sequence and responsibility without taking ownership of domain defin
 9. Translate the accepted proposal into [ProviderPayload](../domain/entities/provider-payload.md) output.
 10. Hand off to the downstream provider adapter for submission.
 
-## Pipeline Notes
+## Flow at a Glance
 
 - steps 1 through 3 prepare the internal reasoning surface
 - steps 4 through 7 are the analyzer-driven reconstruction core
 - step 8 enforces human authority
 - steps 9 and 10 preserve provider separation from the core domain
 
-## Safety Behavior
+## Where Clarification Interrupts the Flow
 
-The pipeline must prefer clarification over fabrication.
-
-That means low-confidence or contradictory states can interrupt normal progression and route into:
+Low-confidence or contradictory states can interrupt normal progression and route into:
 
 - [Clarification Loop](../analyzer/clarification-loop.md)
 - [Failure Modes](../analyzer/failure-modes.md)
@@ -78,8 +74,4 @@ flowchart LR
     class A provider;
 ```
 
-## Boundary Reminder
-
-This pipeline describes how work flows.
-
-It does not redefine what the canonical concepts mean. Those definitions remain in the [Domain Overview](../domain/domain-overview.md) and its linked entity pages.
+Canonical term definitions remain in the [Domain Overview](../domain/domain-overview.md).

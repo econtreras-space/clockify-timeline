@@ -1,0 +1,20 @@
+{
+  "agent": "ct-parser",
+  "name": "parser_multi_day_gap_skip",
+  "input": {
+    "narrative": "2026-05-12: Worked on Nomei QA and reviewed token metrics.\n\n2026-05-14: Fixed Byrrgis export issues and updated release notes.",
+    "timezone": "America/Montevideo"
+  },
+  "expected": [
+    {
+      "date": "2026-05-12",
+      "ambiguous": false
+    },
+    {
+      "date": "2026-05-14",
+      "ambiguous": false
+    }
+  ],
+  "checks": [],
+  "tags": ["edge", "regression"]
+}

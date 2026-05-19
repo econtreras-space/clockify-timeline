@@ -1,7 +1,5 @@
 # TimelineBlock
 
-Back to [Docs Home](../../README.md), [Architectural Principles](../../blueprint/architectural-principles.md), [Architecture Decisions](../../decisions/README.md), and [Domain Overview](../domain-overview.md).
-
 ## Purpose
 
 `TimelineBlock` is the canonical reconstructed temporal block produced during allocation.

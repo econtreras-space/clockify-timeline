@@ -1,0 +1,17 @@
+{
+  "agent": "ct-parser",
+  "name": "parser_happy_single_day",
+  "input": {
+    "narrative": "2026-05-14: Fixed the auth refresh bug, reviewed PR-42, and synced with the team.",
+    "timezone": "America/Montevideo"
+  },
+  "expected": [
+    {
+      "date": "2026-05-14",
+      "timezone": "America/Montevideo",
+      "ambiguous": false
+    }
+  ],
+  "checks": [],
+  "tags": ["happy-path", "regression"]
+}

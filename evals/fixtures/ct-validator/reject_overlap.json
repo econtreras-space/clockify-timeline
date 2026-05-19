@@ -1,0 +1,44 @@
+{
+  "agent": "ct-validator",
+  "name": "validator_reject_overlap",
+  "input": {
+    "date": "2026-05-14",
+    "needs_clarification": false,
+    "clarification_questions": [],
+    "blocks": [
+      {
+        "label": "Daily standup",
+        "description": "Team standup meeting",
+        "start": "11:00",
+        "end": "11:30",
+        "hours": 0.5,
+        "confidence": 1.0,
+        "is_constraint": true,
+        "project_key": null,
+        "category": "meeting"
+      },
+      {
+        "label": "Nomei bugfix",
+        "description": "Fixed the Nomei billing regression",
+        "start": "11:10",
+        "end": "12:10",
+        "hours": 1.0,
+        "confidence": 0.9,
+        "is_constraint": false,
+        "project_key": "nomei",
+        "category": "development"
+      }
+    ],
+    "per_project_budgets": {},
+    "shortfall_hours": 0,
+    "total_hours": 1.5,
+    "validation_state": "pending"
+  },
+  "expected": {
+    "outcome": "reject"
+  },
+  "checks": [
+    "rejection_reason_present"
+  ],
+  "tags": ["happy-path", "regression"]
+}

@@ -1,22 +1,31 @@
 # AI-Assisted Timesheet Reconstruction Docs
 
-This folder captures the architectural decisions for the Clockify-oriented timesheet reconstruction system discussed in the shared conversation:
+This folder explains how the Clockify-oriented reconstruction system is designed, how the current V1 runtime works, and where the boundaries live between reasoning, review, and provider handoff.
 
-- semantic narrative in,
-- plausible timeline proposal out,
-- explicit human review before submission.
+## 5-Minute Mental Model
 
-## What matters most
+- The user provides end-of-day narrative context, not a pre-timed activity log.
+- The analyzer turns that narrative into a plausible, reviewable `TimelineProposal`.
+- Calendar signals and user configuration shape constraints, but they do not become the source of truth.
+- The user reviews, corrects, and confirms before anything reaches a provider adapter.
+- Clockify is the current delivery target, but the internal model stays provider-agnostic.
 
-- The system optimizes for plausibility, not factual reconstruction.
-- The user is always the final authority.
-- The internal domain must stay independent from any single provider.
-- Clockify is an adapter target, not the core model.
-- Calendar context is advisory and constraint-building input, not truth.
+## What This System Is
 
-## High-Level Architecture
+- assisted timesheet reconstruction
+- narrative-to-time translation
+- human-in-the-loop reporting support
 
-This diagram is intentionally interaction-focused. It shows how information moves through the system without re-explaining every domain concept visually.
+## What This System Is Not
+
+- activity surveillance
+- objective productivity measurement
+- autonomous submission
+- historical truth reconstruction
+
+## Conceptual System Map
+
+This diagram is intentionally conceptual. It shows the main handoffs without trying to document the current runtime wiring in detail.
 
 ```mermaid
 flowchart LR
@@ -86,31 +95,37 @@ flowchart LR
     class K,G,X provider;
 ```
 
-## Start Here
+## Reading Tracks
 
-- [Architectural Principles](./blueprint/architectural-principles.md)
-- [Architecture Decisions](./decisions/README.md)
-- [Domain Overview](./domain/domain-overview.md)
-- [Analyzer Overview](./analyzer/analyzer-overview.md)
-- [System Vision](./blueprint/system-vision.md)
-- [High-Level Architecture](./blueprint/high-level-architecture.md)
-- [Operational Pipeline](./blueprint/operational-pipeline.md)
-- [Glossary](./blueprint/glossary.md)
-- [Provider Architecture](./providers/provider-architecture.md)
-- [V1 Validation Checklist](./v1-validation-checklist.md)
-- [Prompt Contracts](./prompts/README.md)
+### Quick Orientation
 
-## Current V1 Scope
+- [System Vision](./blueprint/system-vision.md): what product this is, what it is not, and the V1 framing
+- [Operational Pipeline](./blueprint/operational-pipeline.md): the end-to-end flow from narrative to provider handoff
+- [Agent-Based Orchestration](./blueprint/agent-orchestration.md): how the current V1 runtime delegates that flow today
 
-- End-of-day narrative input
-- Fixed schedule and calendar-aware constraints
-- Plausible timeline reconstruction
-- Clockify-compatible output
-- Mandatory confirmation loop
+### Core Architecture
 
-## Explicitly Out of Scope for V1
+- [Architectural Principles](./blueprint/architectural-principles.md): the non-negotiable design rules
+- [Architecture Decisions](./decisions/README.md): the ADR set, including active and historical decisions
+- [Domain Overview](./domain/domain-overview.md): the canonical source for terminology
+- [Analyzer Overview](./analyzer/analyzer-overview.md): the analyzer's job, inputs, outputs, and stage map
+- [Provider Architecture](./providers/provider-architecture.md): where provider behavior starts and what it does not own
+- [Glossary](./blueprint/glossary.md): a quick lookup guide when you know the question but not the page
 
-- Autonomous timesheet submission without user approval
-- Activity tracking or surveillance
-- Multi-day memory continuity as a first-class requirement
-- A broader cognition or memory platform
+### Current V1 Runtime
+
+- [Agent-Based Orchestration](./blueprint/agent-orchestration.md): the executable runtime shape
+- [Clockify Adapter](./providers/clockify-adapter.md): the current provider-facing handoff boundary
+- [V1 Validation Checklist](./v1-validation-checklist.md): recommended implementation order and validation priorities
+- [Runtime and Portability Notes](./runtime-and-portability-notes.md): runtime lessons, structural risks, and open rollout questions
+- [Prompt Contracts](./prompts/README.md): prompt-stage contracts and prompt authoring order
+
+## Current V1 Focus
+
+- end-of-day narrative input
+- hard schedule and calendar-aware constraints
+- plausible timeline reconstruction
+- explicit human confirmation before submission
+- Clockify-compatible provider output
+
+If you only need one canonical terminology page, start with [Domain Overview](./domain/domain-overview.md).

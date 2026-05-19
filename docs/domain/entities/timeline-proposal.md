@@ -1,7 +1,5 @@
 # TimelineProposal
 
-Back to [Docs Home](../../README.md), [Architectural Principles](../../blueprint/architectural-principles.md), [Architecture Decisions](../../decisions/README.md), and [Domain Overview](../domain-overview.md).
-
 ## Purpose
 
 `TimelineProposal` is the canonical full-day proposal produced by the internal system before provider submission.

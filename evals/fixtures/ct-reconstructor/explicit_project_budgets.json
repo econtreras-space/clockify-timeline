@@ -1,0 +1,36 @@
+{
+  "agent": "ct-reconstructor",
+  "name": "reconstructor_explicit_project_budgets",
+  "input": {
+    "narrative_input": {
+      "date": "2026-05-13",
+      "timezone": "America/Montevideo",
+      "raw_text": "QA Report | Nomei\nHours: 3.5 hs\nVerified the billing flows and logged regressions.\n\nQA Report | Byrrgis\nHours: 4 hs\nChecked the coin list features and reviewed the token metric box changes."
+    }
+  },
+  "expected": {
+    "date": "2026-05-13",
+    "needs_clarification": false,
+    "validation_state": "pending",
+    "per_project_budgets": {
+      "nomei": 3.5,
+      "byrrgis": 4.0
+    }
+  },
+  "checks": [
+    "blocks_within_workday",
+    "no_constraint_overlap",
+    "total_hours_match",
+    "project_keys_known_or_null",
+    "per_project_budgets_known_or_empty",
+    "shortfall_hours_non_negative",
+    "explicit_budget_totals_respected",
+    "expected_project_keys_present"
+  ],
+  "expected_budgets": {
+    "nomei": 3.5,
+    "byrrgis": 4.0
+  },
+  "expected_project_keys": ["nomei", "byrrgis"],
+  "tags": ["edge", "regression"]
+}

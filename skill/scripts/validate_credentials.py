@@ -119,8 +119,6 @@ def main():
         "email": user_email,
         "workspace": ws_name,
         "key_preview": key_preview,
-        "project_id": "set" if creds.get("project_id") else "not set",
-        "timezone": creds.get("timezone", "America/Montevideo (default)")
     }
     print(json.dumps(result, indent=2))
 

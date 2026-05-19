@@ -1,0 +1,14 @@
+{
+  "type": "array",
+  "items": {
+    "type": "object",
+    "required": ["date", "timezone", "raw_text", "ambiguous"],
+    "properties": {
+      "date": { "type": "string" },
+      "timezone": { "type": "string" },
+      "raw_text": { "type": "string" },
+      "ambiguous": { "type": "boolean" }
+    },
+    "additionalProperties": false
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "required": ["outcome", "warnings", "clarification_questions", "rejection_reason"],
+  "properties": {
+    "outcome": {
+      "type": "string",
+      "enum": ["pass", "warn", "needs_clarification", "reject"]
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "clarification_questions": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "rejection_reason": {
+      "type": ["string", "null"]
+    }
+  },
+  "additionalProperties": false
+}

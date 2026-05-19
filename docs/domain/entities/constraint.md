@@ -1,7 +1,5 @@
 # Constraint
 
-Back to [Docs Home](../../README.md), [Architectural Principles](../../blueprint/architectural-principles.md), [Architecture Decisions](../../decisions/README.md), and [Domain Overview](../domain-overview.md).
-
 ## Purpose
 
 `Constraint` is the canonical representation of a hard temporal boundary or reserved time anchor.

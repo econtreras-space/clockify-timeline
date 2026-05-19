@@ -2,7 +2,7 @@
 """Push time entries to Clockify from a structured JSON file.
 
 Reads credentials from ~/.config/clockify/credentials.json
-Input: JSON file with entries array (date, start, end, description, hours)
+Input: JSON file with entries array (date, start, end, description, hours, project_id)
 Output: JSON summary to stdout
 """
 
@@ -81,11 +81,12 @@ def get_tz_offset(tz_name):
     }
     return offsets.get(tz_name, -3)
 
-def push_entry(api_key, workspace_id, project_id, entry, tz_offset, user_id):
+def push_entry(api_key, workspace_id, entry, tz_offset, user_id):
     date = entry["date"]
     start_utc = to_utc(date, entry["start"], tz_offset)
     end_utc = to_utc(date, entry["end"], tz_offset)
     description = entry["description"]
+    project_id = entry.get("project_id")
 
     body = {
         "start": start_utc,
@@ -138,7 +139,6 @@ def main():
     creds = load_credentials()
     api_key = creds["api_key"]
     workspace_id = creds["workspace_id"]
-    project_id = creds.get("project_id")
     tz_name = creds.get("timezone", "America/Montevideo")
     tz_offset = get_tz_offset(tz_name)
 
@@ -166,7 +166,7 @@ def main():
     fail_count = 0
 
     for i, entry in enumerate(entries):
-        result = push_entry(api_key, workspace_id, project_id, entry, tz_offset, user_id)
+        result = push_entry(api_key, workspace_id, entry, tz_offset, user_id)
         results.append(result)
         if result["status"] == "ok":
             ok_count += 1

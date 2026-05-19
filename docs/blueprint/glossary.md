@@ -1,38 +1,37 @@
 # Glossary
 
-Back to [Docs Home](../README.md), [Architectural Principles](./architectural-principles.md), [Architecture Decisions](../decisions/README.md), and [Domain Overview](../domain/domain-overview.md).
-
 ## Purpose
 
-This glossary is a navigation layer.
+This glossary is a navigation layer for fast skimming.
 
-It helps readers find canonical terms quickly, but it does not replace the `domain/` section as the source of truth.
+It helps you find the right page quickly, but it does not replace [Domain Overview](../domain/domain-overview.md) as the source of truth.
 
-## Narrative Concepts
+## If You Are Trying to Understand the Input Side
 
-- [NarrativeInput](../domain/entities/narrative-input.md): raw human update plus minimal context
-- [WorkUnit](../domain/entities/work-unit.md): semantic unit of work extracted from narrative
+- [Narrative Domain](../domain/narrative-domain.md): how user updates enter the system
+- [NarrativeInput](../domain/entities/narrative-input.md): the raw reporting input
+- [WorkUnit](../domain/entities/work-unit.md): the semantic work extracted from that input
 
-## Constraint and Temporal Concepts
+## If You Are Trying to Understand Time Allocation
 
-- [Constraint](../domain/entities/constraint.md): hard boundary or reserved time anchor
-- `AvailableGap`: allocatable region after constraints are applied; defined canonically in [Domain Overview](../domain/domain-overview.md)
-- [TimelineBlock](../domain/entities/timeline-block.md): reconstructed temporal block
-- [TimelineProposal](../domain/entities/timeline-proposal.md): full proposed day allocation
-- `Validation/Confidence State`: warnings, ambiguity, and clarification-needed signals; defined canonically in [Domain Overview](../domain/domain-overview.md)
+- [Constraint Domain](../domain/constraint-domain.md): what limits where work can be placed
+- [Temporal Domain](../domain/temporal-domain.md): how plausible day structure is represented
+- [Temporal Reconstruction](../analyzer/temporal-reconstruction.md): how semantic work becomes time blocks
 
-## Provider Concepts
+## If You Are Trying to Understand Review and Safety
 
-- [ProviderPayload](../domain/entities/provider-payload.md): provider-facing representation derived from internal domain state
+- [Human Authority Domain](../domain/human-authority-domain.md): who decides whether the proposal is acceptable
+- [Clarification Loop](../analyzer/clarification-loop.md): when the system asks instead of guessing
+- [Failure Modes](../analyzer/failure-modes.md): how weak or contradictory cases fail safely
 
-## Authority and Review Concepts
+## If You Are Trying to Understand Provider Handoff
 
-- user authority: defined in [Human Authority Domain](../domain/human-authority-domain.md)
-- clarification: behavior owned by [Clarification Loop](../analyzer/clarification-loop.md)
-- confirmation: authority boundary described in [Human Authority Domain](../domain/human-authority-domain.md)
+- [Provider Domain](../domain/provider-domain.md): the translation boundary from internal meaning to external payloads
+- [Provider Architecture](../providers/provider-architecture.md): what adapters own
+- [Clockify Adapter](../providers/clockify-adapter.md): the current concrete provider target
 
 ## Where to Go Next
 
 - For canonical definitions, start in [Domain Overview](../domain/domain-overview.md).
-- For subsystem behavior, continue to [Analyzer Overview](../analyzer/analyzer-overview.md).
-- For system framing, continue to [System Vision](./system-vision.md) and [High-Level Architecture](./high-level-architecture.md).
+- For system behavior, continue to [Analyzer Overview](../analyzer/analyzer-overview.md) and [Operational Pipeline](./operational-pipeline.md).
+- For the current runtime shape, continue to [Agent-Based Orchestration](./agent-orchestration.md).

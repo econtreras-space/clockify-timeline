@@ -19,7 +19,7 @@ The contracts in this folder are the bridge between:
 - the validation boundary,
 - and the actual skill implementation.
 
-## Recommended Order
+## Prompt Authoring Order
 
 The recommended V1 authoring order is:
 

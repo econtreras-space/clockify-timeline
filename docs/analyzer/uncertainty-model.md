@@ -1,7 +1,5 @@
 # Uncertainty Model
 
-Back to [Docs Home](../README.md), [Architectural Principles](../blueprint/architectural-principles.md), [Architecture Decisions](../decisions/README.md), [Domain Overview](../domain/domain-overview.md), and [Analyzer Overview](./analyzer-overview.md).
-
 ## Primary Question
 
 How does the analyzer represent ambiguity and confidence without pretending to know more than it does?
