@@ -1,7 +1,5 @@
 # Constraint Domain
 
-Back to [Docs Home](../README.md), [Architectural Principles](../blueprint/architectural-principles.md), [Architecture Decisions](../decisions/README.md), and [Domain Overview](./domain-overview.md).
-
 ## Purpose
 
 The constraint domain defines how the system represents fixed temporal boundaries and reserved time anchors.

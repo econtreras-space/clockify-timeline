@@ -1,0 +1,49 @@
+{
+  "agent": "ct-push",
+  "name": "push_null_project",
+  "input": {
+    "proposal": {
+      "date": "2026-05-16",
+      "needs_clarification": false,
+      "clarification_questions": [],
+      "blocks": [
+        {
+          "label": "General review",
+          "description": "Reviewed open pull requests and bug notes",
+          "start": "09:00",
+          "end": "11:00",
+          "hours": 2.0,
+          "confidence": 0.9,
+          "is_constraint": false,
+          "project_key": null,
+          "category": "review"
+        }
+      ],
+      "per_project_budgets": {},
+      "shortfall_hours": 0,
+      "total_hours": 2.0,
+      "validation_state": "pending"
+    }
+  },
+  "expected": {
+    "entries_pushed": 1,
+    "entries_failed": 0
+  },
+  "expected_payload": {
+    "entries": [
+      {
+        "project_id": null
+      }
+    ],
+    "summary": {
+      "total_hours": 2.0
+    }
+  },
+  "checks": [
+    "provider_payload_schema",
+    "provider_summary_matches_entries",
+    "project_ids_mapped_or_null",
+    "no_project_key_leak"
+  ],
+  "tags": ["edge", "regression"]
+}

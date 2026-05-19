@@ -1,7 +1,5 @@
 # Failure Modes
 
-Back to [Docs Home](../README.md), [Architectural Principles](../blueprint/architectural-principles.md), [Architecture Decisions](../decisions/README.md), [Domain Overview](../domain/domain-overview.md), and [Analyzer Overview](./analyzer-overview.md).
-
 ## Primary Question
 
 How should the analyzer fail safely when it cannot produce a trustworthy reconstruction?

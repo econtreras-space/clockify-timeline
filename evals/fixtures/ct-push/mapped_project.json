@@ -1,0 +1,62 @@
+{
+  "agent": "ct-push",
+  "name": "push_mapped_project",
+  "input": {
+    "proposal": {
+      "date": "2026-05-14",
+      "needs_clarification": false,
+      "clarification_questions": [],
+      "blocks": [
+        {
+          "label": "Nomei bugfix",
+          "description": "Fixed the Nomei billing regression",
+          "start": "09:00",
+          "end": "11:00",
+          "hours": 2.0,
+          "confidence": 0.9,
+          "is_constraint": false,
+          "project_key": "nomei",
+          "category": "development"
+        },
+        {
+          "label": "Daily standup",
+          "description": "Team standup meeting",
+          "start": "11:00",
+          "end": "11:30",
+          "hours": 0.5,
+          "confidence": 1.0,
+          "is_constraint": true,
+          "project_key": null,
+          "category": "meeting"
+        }
+      ],
+      "per_project_budgets": {},
+      "shortfall_hours": 0,
+      "total_hours": 2.5,
+      "validation_state": "pending"
+    }
+  },
+  "expected": {
+    "entries_pushed": 1,
+    "entries_failed": 0,
+    "timesheet_saved": true
+  },
+  "expected_payload": {
+    "entries": [
+      {
+        "project_id": "6a0b7c7b5573c2819ec43a40"
+      }
+    ],
+    "summary": {
+      "total_hours": 2.0
+    }
+  },
+  "checks": [
+    "provider_payload_schema",
+    "provider_summary_matches_entries",
+    "no_constraints_in_payload",
+    "project_ids_mapped_or_null",
+    "no_project_key_leak"
+  ],
+  "tags": ["happy-path", "regression"]
+}

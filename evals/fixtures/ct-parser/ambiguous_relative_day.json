@@ -1,0 +1,16 @@
+{
+  "agent": "ct-parser",
+  "name": "parser_ambiguous_relative_day",
+  "input": {
+    "narrative": "Worked on Friday on auth fixes, a couple of QA notes, and some PR review.",
+    "timezone": "America/Montevideo"
+  },
+  "expected": [
+    {
+      "ambiguous": true,
+      "timezone": "America/Montevideo"
+    }
+  ],
+  "checks": [],
+  "tags": ["edge", "adversarial"]
+}

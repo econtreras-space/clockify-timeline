@@ -1,7 +1,5 @@
 # Provider Domain
 
-Back to [Docs Home](../README.md), [Architectural Principles](../blueprint/architectural-principles.md), [Architecture Decisions](../decisions/README.md), and [Domain Overview](./domain-overview.md).
-
 ## Purpose
 
 The provider domain defines how internal concepts are translated into external system payloads without allowing those external schemas to shape the core model.

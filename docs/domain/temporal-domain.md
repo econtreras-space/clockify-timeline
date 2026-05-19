@@ -1,7 +1,5 @@
 # Temporal Domain
 
-Back to [Docs Home](../README.md), [Architectural Principles](../blueprint/architectural-principles.md), [Architecture Decisions](../decisions/README.md), and [Domain Overview](./domain-overview.md).
-
 ## Purpose
 
 The temporal domain defines how the system represents plausible time structure internally.

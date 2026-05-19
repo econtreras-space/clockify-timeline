@@ -1,7 +1,5 @@
 # WorkUnit
 
-Back to [Docs Home](../../README.md), [Architectural Principles](../../blueprint/architectural-principles.md), [Architecture Decisions](../../decisions/README.md), and [Domain Overview](../domain-overview.md).
-
 ## Purpose
 
 `WorkUnit` is the canonical semantic unit of work extracted from `NarrativeInput`.

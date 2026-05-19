@@ -1,0 +1,67 @@
+{
+  "agent": "ct-push",
+  "name": "push_summary_excludes_constraints",
+  "input": {
+    "proposal": {
+      "date": "2026-05-17",
+      "needs_clarification": false,
+      "clarification_questions": [],
+      "blocks": [
+        {
+          "label": "Nomei QA",
+          "description": "Verified Nomei billing flow",
+          "start": "09:00",
+          "end": "11:00",
+          "hours": 2.0,
+          "confidence": 0.9,
+          "is_constraint": false,
+          "project_key": "nomei",
+          "category": "review"
+        },
+        {
+          "label": "Daily standup",
+          "description": "Team standup meeting",
+          "start": "11:00",
+          "end": "11:30",
+          "hours": 0.5,
+          "confidence": 1.0,
+          "is_constraint": true,
+          "project_key": null,
+          "category": "meeting"
+        },
+        {
+          "label": "Byrrgis export review",
+          "description": "Checked the Byrrgis export fix",
+          "start": "13:30",
+          "end": "15:00",
+          "hours": 1.5,
+          "confidence": 0.9,
+          "is_constraint": false,
+          "project_key": "byrrgis",
+          "category": "review"
+        }
+      ],
+      "per_project_budgets": {},
+      "shortfall_hours": 0,
+      "total_hours": 4.0,
+      "validation_state": "pending"
+    }
+  },
+  "expected": {
+    "entries_pushed": 2,
+    "entries_failed": 0
+  },
+  "expected_payload": {
+    "summary": {
+      "total_hours": 3.5,
+      "total_days": 1
+    }
+  },
+  "checks": [
+    "provider_payload_schema",
+    "provider_summary_matches_entries",
+    "no_constraints_in_payload",
+    "project_ids_mapped_or_null"
+  ],
+  "tags": ["edge", "regression"]
+}

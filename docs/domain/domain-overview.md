@@ -1,7 +1,5 @@
 # Domain Overview
 
-Back to [Docs Home](../README.md), [Architectural Principles](../blueprint/architectural-principles.md), and [Architecture Decisions](../decisions/README.md).
-
 ## Purpose
 
 This section is the canonical source of domain terminology for the system.
@@ -26,7 +24,7 @@ The internal model is organized around five major areas:
 
 ## Canonical Concepts
 
-The following terms should be used consistently across the docs set:
+The following terms are the shared vocabulary for the docs set:
 
 - [NarrativeInput](./entities/narrative-input.md): raw human update plus minimal context
 - [WorkUnit](./entities/work-unit.md): semantic unit of work extracted from narrative

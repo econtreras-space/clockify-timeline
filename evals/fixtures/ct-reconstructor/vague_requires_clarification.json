@@ -1,0 +1,20 @@
+{
+  "agent": "ct-reconstructor",
+  "name": "reconstructor_vague_requires_clarification",
+  "input": {
+    "narrative_input": {
+      "date": "2026-05-17",
+      "timezone": "America/Montevideo",
+      "raw_text": "Worked on some stuff, checked a few things, and handled various tasks."
+    }
+  },
+  "expected": {
+    "date": "2026-05-17",
+    "needs_clarification": true,
+    "validation_state": "pending"
+  },
+  "checks": [
+    "clarification_requires_empty_blocks"
+  ],
+  "tags": ["adversarial", "regression"]
+}

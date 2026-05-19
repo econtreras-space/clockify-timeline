@@ -1,0 +1,37 @@
+{
+  "name": "chain_parser_reconstructor_validator_happy",
+  "steps": [
+    {
+      "agent": "ct-parser",
+      "input": {
+        "narrative": "2026-05-14: Worked on Nomei billing QA, fixed the regression, documented the rollout, and reviewed the release PR.",
+        "timezone": "America/Montevideo"
+      },
+      "expected": [
+        {
+          "date": "2026-05-14",
+          "ambiguous": false
+        }
+      ]
+    },
+    {
+      "agent": "ct-reconstructor",
+      "input_from": "parser_first",
+      "expected": {
+        "needs_clarification": false,
+        "validation_state": "pending"
+      },
+      "checks": [
+        "blocks_within_workday",
+        "total_hours_match",
+        "project_keys_known_or_null"
+      ]
+    },
+    {
+      "agent": "ct-validator",
+      "input_from": "previous",
+      "allowed_outcomes": ["pass", "warn"]
+    }
+  ],
+  "tags": ["happy-path", "smoke"]
+}
