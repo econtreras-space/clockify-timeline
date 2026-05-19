@@ -7,7 +7,7 @@
         "narrative_input": {
           "date": "2026-05-15",
           "timezone": "America/Montevideo",
-          "raw_text": "Worked on Aura billing QA, documented the fix, and reviewed the release notes."
+          "raw_text": "Worked on Nomei billing QA, documented the fix, and reviewed the release notes."
         }
       },
       "expected": {

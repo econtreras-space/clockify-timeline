@@ -19,6 +19,8 @@
           "category": "review"
         }
       ],
+      "per_project_budgets": {},
+      "shortfall_hours": 0,
       "total_hours": 2.0,
       "validation_state": "pending"
     }

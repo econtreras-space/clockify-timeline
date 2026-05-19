@@ -5,7 +5,7 @@
     "narrative_input": {
       "date": "2026-05-14",
       "timezone": "America/Montevideo",
-      "raw_text": "Worked on Aura all day. Fixed the billing regression, reviewed the Aura release PR, and documented the rollout notes."
+      "raw_text": "Worked on Nomei all day. Fixed the billing regression, reviewed the Nomei release PR, and documented the rollout notes."
     }
   },
   "expected": {
@@ -18,8 +18,10 @@
     "no_constraint_overlap",
     "total_hours_match",
     "project_keys_known_or_null",
+    "per_project_budgets_known_or_empty",
+    "shortfall_hours_non_negative",
     "no_provider_fields_before_push"
   ],
-  "expected_project_keys": ["aura"],
+  "expected_project_keys": ["nomei"],
   "tags": ["happy-path", "regression"]
 }

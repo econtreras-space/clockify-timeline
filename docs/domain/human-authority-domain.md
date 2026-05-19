@@ -1,7 +1,5 @@
 # Human Authority Domain
 
-Back to [Docs Home](../README.md), [Architectural Principles](../blueprint/architectural-principles.md), [Architecture Decisions](../decisions/README.md), and [Domain Overview](./domain-overview.md).
-
 ## Purpose
 
 The human authority domain defines the review and correction boundary around generated proposals.

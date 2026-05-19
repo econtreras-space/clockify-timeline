@@ -4,7 +4,7 @@ An AI-assisted timesheet reconstruction tool. You paste your end-of-day narrativ
 
 The system never submits anything without your explicit approval. It reconstructs only what you described. It asks clarifying questions when the narrative is too thin to produce a believable proposal.
 
-> For a deeper look at why the system works the way it does, see [docs/blueprint/system-vision.md](docs/blueprint/system-vision.md).
+> For the architecture map and reading paths, start with [docs/README.md](docs/README.md).
 
 ---
 
@@ -114,11 +114,14 @@ example/                Sample JSON output files
 
 | What you want to understand | Where to look |
 |---|---|
+| How to read the architecture docs quickly | [docs/README.md](docs/README.md) |
 | Why the system works this way | [docs/blueprint/system-vision.md](docs/blueprint/system-vision.md) |
 | How the pieces fit together | [docs/blueprint/high-level-architecture.md](docs/blueprint/high-level-architecture.md) |
 | The full pipeline step by step | [docs/blueprint/operational-pipeline.md](docs/blueprint/operational-pipeline.md) |
+| How the current V1 runtime is actually wired | [docs/blueprint/agent-orchestration.md](docs/blueprint/agent-orchestration.md) |
 | What each domain concept means | [docs/domain/domain-overview.md](docs/domain/domain-overview.md) |
 | How the Analyzer reasons | [docs/analyzer/analyzer-overview.md](docs/analyzer/analyzer-overview.md) |
 | Architectural decisions and their rationale | [docs/decisions/README.md](docs/decisions/README.md) |
 | How the Clockify adapter works | [docs/providers/clockify-adapter.md](docs/providers/clockify-adapter.md) |
+| Runtime lessons and portability concerns | [docs/runtime-and-portability-notes.md](docs/runtime-and-portability-notes.md) |
 | Key terms | [docs/blueprint/glossary.md](docs/blueprint/glossary.md) |

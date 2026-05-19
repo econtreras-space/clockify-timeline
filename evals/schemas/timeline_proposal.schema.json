@@ -2,6 +2,8 @@
   "type": "object",
   "required": [
     "date",
+    "per_project_budgets",
+    "shortfall_hours",
     "needs_clarification",
     "clarification_questions",
     "blocks",
@@ -10,6 +12,17 @@
   ],
   "properties": {
     "date": { "type": "string" },
+    "per_project_budgets": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number",
+        "minimum": 0
+      }
+    },
+    "shortfall_hours": {
+      "type": "number",
+      "minimum": 0
+    },
     "needs_clarification": { "type": "boolean" },
     "clarification_questions": {
       "type": "array",

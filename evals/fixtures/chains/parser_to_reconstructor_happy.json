@@ -4,7 +4,7 @@
     {
       "agent": "ct-parser",
       "input": {
-        "narrative": "2026-05-14: Worked on Aura billing QA, fixed the regression, and reviewed the release PR.",
+        "narrative": "2026-05-14: Worked on Nomei billing QA, fixed the regression, and reviewed the release PR.",
         "timezone": "America/Montevideo"
       },
       "expected": [

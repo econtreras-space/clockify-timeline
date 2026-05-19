@@ -1,12 +1,10 @@
 # Analyzer Overview
 
-Back to [Docs Home](../README.md), [Architectural Principles](../blueprint/architectural-principles.md), [Architecture Decisions](../decisions/README.md), and [Domain Overview](../domain/domain-overview.md).
-
 ## Purpose
 
 The analyzer is the core reasoning subsystem that transforms a `NarrativeInput` into a plausible, reviewable `TimelineProposal`.
 
-Its job is not to discover exact historical truth. Its job is to translate imperfect narrative context into a temporal proposal that:
+Its job is to translate imperfect narrative context into a temporal proposal that:
 
 - respects `Constraint` data,
 - uses `AvailableGap` regions responsibly,
@@ -14,16 +12,7 @@ Its job is not to discover exact historical truth. Its job is to translate imper
 - surfaces uncertainty honestly,
 - and remains easy for a human to review and correct.
 
-## Core Invariants
-
-The analyzer:
-
-- does not discover truth,
-- does not track real activity,
-- does not invent new work,
-- does not override the user.
-
-The analyzer distributes time. It does not observe time.
+It proposes plausible time. It does not observe history, invent new work, or replace the user's authority.
 
 ## Interaction Diagram
 
@@ -94,7 +83,7 @@ The analyzer produces a structured proposal, not a silent side effect:
 - `Validation/Confidence State`: warnings, ambiguity markers, and confidence signals
 - clarification requirement: whether the system should ask follow-up questions before trusting the proposal
 
-## End-to-End Flow
+## Analyzer Stage Map
 
 At a high level, the analyzer operates in five stages:
 
@@ -104,19 +93,7 @@ At a high level, the analyzer operates in five stages:
 4. Build plausible `TimelineBlock` allocations while respecting uncertainty and operational noise.
 5. Emit a reviewable `TimelineProposal` plus `Validation/Confidence State`.
 
-## Canonical Concepts
-
-The analyzer pages use the following terms consistently:
-
-- `NarrativeInput`: raw human update plus minimal context
-- `WorkUnit`: semantic unit of work extracted from the narrative
-- `Constraint`: hard boundary or reserved time anchor
-- `AvailableGap`: allocatable region after constraints are applied
-- `TimelineBlock`: reconstructed temporal block
-- `TimelineProposal`: full proposed allocation for the day
-- `Validation/Confidence State`: warnings, ambiguity, and clarification-needed signals
-
-These terms are defined canonically in the [Domain Overview](../domain/domain-overview.md) and its linked entity pages.
+Canonical terminology for these pages lives in the [Domain Overview](../domain/domain-overview.md). Use that page as the source of truth for term definitions.
 
 ## Deeper Pages
 

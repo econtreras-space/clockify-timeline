@@ -5,7 +5,7 @@
     "narrative_input": {
       "date": "2026-05-13",
       "timezone": "America/Montevideo",
-      "raw_text": "Worked a shorter day. Aura QA report for 2 hours and Asda export review for 3 hours, then I stopped for the day."
+      "raw_text": "Worked a shorter day. Nomei QA report for 2 hours and Byrrgis export review for 3 hours, then I stopped for the day."
     }
   },
   "expected": {
@@ -18,6 +18,8 @@
     "no_constraint_overlap",
     "total_hours_match",
     "project_keys_known_or_null",
+    "per_project_budgets_known_or_empty",
+    "shortfall_hours_non_negative",
     "proposal_total_hours_at_most"
   ],
   "max_total_hours": 6.0,

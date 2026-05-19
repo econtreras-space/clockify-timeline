@@ -1,7 +1,5 @@
 # ProviderPayload
 
-Back to [Docs Home](../../README.md), [Architectural Principles](../../blueprint/architectural-principles.md), [Architecture Decisions](../../decisions/README.md), and [Domain Overview](../domain-overview.md).
-
 ## Purpose
 
 `ProviderPayload` is the canonical provider-facing representation derived from internal domain state.

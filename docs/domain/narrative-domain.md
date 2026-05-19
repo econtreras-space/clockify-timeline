@@ -1,7 +1,5 @@
 # Narrative Domain
 
-Back to [Docs Home](../README.md), [Architectural Principles](../blueprint/architectural-principles.md), [Architecture Decisions](../decisions/README.md), and [Domain Overview](./domain-overview.md).
-
 ## Purpose
 
 The narrative domain defines how human work descriptions enter the system as meaningful internal input.

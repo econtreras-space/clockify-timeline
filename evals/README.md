@@ -24,6 +24,7 @@ The runner loads the checked-in subagent markdown files, converts them into inli
 
 - `--agent`
 - `--agents`
+- `--output-format json`
 - `--no-session-persistence`
 
 Default local runs do **not** use `--bare`. This lets the harness use the normal Claude Code login flow while still avoiding persisted conversation state.
@@ -50,6 +51,18 @@ Run only fixtures matching a substring:
 python3 evals/run_subagent_evals.py --match ct-reconstructor
 ```
 
+Run with stricter output enforcement:
+
+```bash
+python3 evals/run_subagent_evals.py --strict-output
+```
+
+Run with richer console detail:
+
+```bash
+python3 evals/run_subagent_evals.py --verbose --show-passing-usage
+```
+
 Run in explicit bare/headless mode:
 
 ```bash
@@ -60,6 +73,8 @@ ANTHROPIC_API_KEY=... python3 evals/run_subagent_evals.py --bare-mode
 
 - Default local runs require a working `claude auth login`.
 - Bare mode requires `ANTHROPIC_API_KEY`.
-- The runner performs an auth preflight before invoking any subagent.
+- The runner performs an auth preflight before invoking any subagent and exits non-zero immediately if auth is missing.
+- The runner writes a run-level summary JSON plus per-fixture artifacts under `/tmp/clockify-subagent-evals/`.
+- Default output is compact, but failed fixtures print failure category, reason, excerpt, and artifact path automatically.
 - Eval artifacts are written to `/tmp/clockify-subagent-evals/`.
 - `ct-push` tests use disposable mock scripts and never call the live Clockify API.

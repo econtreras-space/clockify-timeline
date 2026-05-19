@@ -1,7 +1,5 @@
 # Temporal Reconstruction
 
-Back to [Docs Home](../README.md), [Architectural Principles](../blueprint/architectural-principles.md), [Architecture Decisions](../decisions/README.md), [Domain Overview](../domain/domain-overview.md), and [Analyzer Overview](./analyzer-overview.md).
-
 ## Primary Question
 
 How does the analyzer turn `WorkUnit` meaning into plausible `TimelineBlock` allocations?

@@ -8,14 +8,14 @@
       "clarification_questions": [],
       "blocks": [
         {
-          "label": "Aura QA",
-          "description": "Verified Aura billing flow",
+          "label": "Nomei QA",
+          "description": "Verified Nomei billing flow",
           "start": "09:00",
           "end": "11:00",
           "hours": 2.0,
           "confidence": 0.9,
           "is_constraint": false,
-          "project_key": "aura",
+          "project_key": "nomei",
           "category": "review"
         },
         {
@@ -30,17 +30,19 @@
           "category": "meeting"
         },
         {
-          "label": "Asda export review",
-          "description": "Checked the Asda export fix",
+          "label": "Byrrgis export review",
+          "description": "Checked the Byrrgis export fix",
           "start": "13:30",
           "end": "15:00",
           "hours": 1.5,
           "confidence": 0.9,
           "is_constraint": false,
-          "project_key": "asda",
+          "project_key": "byrrgis",
           "category": "review"
         }
       ],
+      "per_project_budgets": {},
+      "shortfall_hours": 0,
       "total_hours": 4.0,
       "validation_state": "pending"
     }

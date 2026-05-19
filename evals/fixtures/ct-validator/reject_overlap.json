@@ -18,17 +18,19 @@
         "category": "meeting"
       },
       {
-        "label": "Aura bugfix",
-        "description": "Fixed the Aura billing regression",
+        "label": "Nomei bugfix",
+        "description": "Fixed the Nomei billing regression",
         "start": "11:10",
         "end": "12:10",
         "hours": 1.0,
         "confidence": 0.9,
         "is_constraint": false,
-        "project_key": "aura",
+        "project_key": "nomei",
         "category": "development"
       }
     ],
+    "per_project_budgets": {},
+    "shortfall_hours": 0,
     "total_hours": 1.5,
     "validation_state": "pending"
   },

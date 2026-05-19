@@ -2,7 +2,7 @@
 
 These ADRs summarize the core architectural decisions extracted from the shared design conversation.
 
-## ADR Index
+## Active ADRs
 
 - [ADR-001 User Authority Is Final](./ADR-001-user-authority.md)
 - [ADR-002 Internal Domain Must Be Provider-Agnostic](./ADR-002-provider-agnostic-domain.md)
@@ -10,9 +10,13 @@ These ADRs summarize the core architectural decisions extracted from the shared 
 - [ADR-004 Plausibility Is Preferred Over Precision](./ADR-004-plausibility-over-precision.md)
 - [ADR-005 Calendar Data Is Advisory, Not Authoritative](./ADR-005-calendar-is-advisory.md)
 
+## Historical or Superseded ADRs
+
+- [ADR-006 Productive Hours Are Guidance, Not Mandatory Coverage](./ADR-006-mandatory-daily-coverage.md) - superseded by the current V1 agent-oriented direction, but still useful as design history
+
 ## Candidate Future ADRs
 
-These came up in the conversation as likely follow-up decisions, but they were not as stable or finalized as the five core ADRs above:
+These came up in the conversation as likely follow-up decisions, but they were not as stable or finalized as the active ADR set above:
 
 - clarification thresholds under low confidence,
 - operational noise defaults and configurability,

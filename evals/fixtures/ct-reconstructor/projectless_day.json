@@ -18,6 +18,8 @@
     "no_constraint_overlap",
     "total_hours_match",
     "project_keys_known_or_null",
+    "per_project_budgets_known_or_empty",
+    "shortfall_hours_non_negative",
     "all_nonconstraint_projectless"
   ],
   "tags": ["edge", "regression"]
